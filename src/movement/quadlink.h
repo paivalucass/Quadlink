@@ -13,28 +13,38 @@ namespace quadlink {
         QuadCopter
     };
 
-    class QuadCopter {
+    enum class FlightStatus {
+        IN_PROGRESS,
+        FAILED,
+        FINISHED
+    };
+
+    /*
+        This class should be adaptable to all vehicles.
+    */
+    class UAV {
     public:
-        // Constructor
-        QuadCopter(const mavsdk::Mavsdk::Configuration& config);
+        // Constructor of the UAV class
+        UAV(const mavsdk::Mavsdk::Configuration& config, Vehicle vehicle_type);
 
         // Connect the drone via UDP, TCP, Serial
-        bool connect(const std::string& connection_url);
+        FlightStatus connect(const std::string& connection_url);
 
         // Do pre flight check and perform arm
-        bool arm();
+        FlightStatus arm();
 
         // Perform takeoff
-        bool takeoff(double target_height);
+        FlightStatus takeoff(double target_height);
 
         // Perform land
-        void land();
+        FlightStatus land();
 
         // Obtain battery level
         void get_battery_status();
 
     private:
-        std::string vehicle_type = "QUADCOPTER";
+        Vehicle vehicle_type;
+        std::string vehicle_name;
         mavsdk::Mavsdk mavsdk;
         std::shared_ptr<mavsdk::Action> action;
         std::shared_ptr<mavsdk::Telemetry> telemetry;
