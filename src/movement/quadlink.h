@@ -1,4 +1,4 @@
-// Drone.h
+// quadlink.h
 #pragma once
 
 #include <string>
@@ -9,29 +9,35 @@
 
 namespace quadlink {
 
+    enum class Vehicle {
+        QuadCopter
+    };
+
     class QuadCopter {
     public:
-        // Construtor que inicializa o drone com uma configuração específica
+        // Constructor
         QuadCopter(const mavsdk::Mavsdk::Configuration& config);
 
-        // Método para conectar o drone via URL (pode ser UDP, TCP, etc.)
+        // Connect the drone via UDP, TCP, Serial
         bool connect(const std::string& connection_url);
 
-        // Método para iniciar o voo
-        void takeoff(double height);
+        // Do pre flight check and perform arm
+        bool arm();
 
-        // Método para pousar o drone
+        // Perform takeoff
+        bool takeoff(double target_height);
+
+        // Perform land
         void land();
 
-        // Método para obter o nível de bateria atual
+        // Obtain battery level
         void get_battery_status();
 
     private:
-        // Instâncias do MAVSDK, Action e Telemetry
+        std::string vehicle_type = "QUADCOPTER";
         mavsdk::Mavsdk mavsdk;
         std::shared_ptr<mavsdk::Action> action;
         std::shared_ptr<mavsdk::Telemetry> telemetry;
     };
-
 }
 
