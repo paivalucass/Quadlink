@@ -1,3 +1,4 @@
+#include <quadlink.h>
 #include <iostream>
 #include <mavsdk/mavsdk.h>
 #include <mavsdk/plugins/action/action.h>
@@ -5,51 +6,51 @@
 #include <thread>
 #include <chrono>
 
-using namespace mavsdk;
+using namespace quadlink;
 using namespace std;
 
-int main() {
-    // Creating asn instance of Mavsdk and configuring it to connect to the GroundStation component
-    Mavsdk::Configuration config(mavsdk::Mavsdk::ComponentType::GroundStation);
-    Mavsdk mavsdk(config);
+QuadCopter::QuadCopter(const mavsdk::Mavsdk::Configuration& config) : mavsdk(config) {
+}
 
-    // Connecting via TCP 
-    string connection_url = "udpin://127.0.0.1:14562"; // IP and port of the GroundStation
-    ConnectionResult connection_result = mavsdk.add_any_connection(connection_url);
+bool QuadCopter::connect(const std::string& connection_url){
+    /*
+        Connection URL only tested with UDP for now 
+        e.g udpin://127.0.0.1:14562 
+    */
 
-    if (connection_result != ConnectionResult::Success) {
-        cerr << "Falha na conexão" << endl;
-        return 1;
+    //Connect via string
+    cout << "[INFO] CONNECTING TO QUADCOPTER" << endl;
+
+    mavsdk::ConnectionResult connection_result = mavsdk.add_any_connection(connection_url);
+
+    if (connection_result != mavsdk::ConnectionResult::Success) {
+        cerr << "Connection Failed" << endl;
+        return false;
     }
 
-    // Waiting for the connection
-    cout << "Esperando pelo sistema..." << endl;
+    //Find Quadcopter in system array
+    cout << "[INFO] WAITING FOR SYSTEM..." << endl;
 
-    while (mavsdk.systems().size() == 0) {
+    while (mavsdk.systems().size() == 0){
         this_thread::sleep_for(chrono::seconds(1));
     }
 
     auto system = mavsdk.systems().at(0);
-
-    if (!system->is_connected()) {
-        cerr << "Nenhum drone conectado!" << endl;
-        return 1;
+    
+    //Declare pluguin variables if connection succeeded
+    if (!system->is_connected()){
+        cerr << "Connection to QuadCopter Failed" << endl;
+        return false;
     }
 
-    cout << "Drone conectado!" << endl;
+    else{
+        cout << "[INFO] CONNECTED TO QUADCOPTER" << endl;
+        QuadCopter::action = std::make_shared<mavsdk::Action>(system);
+        QuadCopter::telemetry = std::make_shared<mavsdk::Telemetry>(system);
+        return true;
+    }
+}
 
-    // Creating instances of Action and Telemetry
-    auto action = std::make_shared<Action>(system);
-    auto telemetry = std::make_shared<Telemetry>(system);
+void QuadCopter::takeoff(double height){
 
-    // Example: Gathering data from Telemetry
-    // Lambda function
-    telemetry->subscribe_battery([](Telemetry::Battery battery) {
-        cout << "Bateria: " << battery.remaining_percent << "%" << endl;
-    });
-
-    // Time sleep but in C++
-    this_thread::sleep_for(chrono::seconds(5));
-
-    return 0;
 }
