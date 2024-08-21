@@ -10,28 +10,38 @@
 using namespace quadlink;
 using namespace std; 
 
-QuadCopter::QuadCopter(const mavsdk::Mavsdk::Configuration& config) : mavsdk(config) {
+UAV::UAV(const mavsdk::Mavsdk::Configuration& config, Vehicle Vehicle_type) : mavsdk(config), vehicle_type(vehicle_type) {
+    switch (vehicle_type)
+    {
+    case Vehicle::QuadCopter:
+        vehicle_name = "QUADCOPTER";
+        // More vehicle specific variables should be initialized here
+        break;
+    // TODO: Add more vehicle support in the future
+    default:
+        break;
+    }
 }
 
-bool QuadCopter::connect(const std::string& connection_url)
+FlightStatus UAV::connect(const std::string& connection_url)
 {
     /*
         Connection URL only tested with UDP for now 
-        e.g udpin://127.0.0.1:14562 
+        e.g udpin://127.0.0.1:14568 
     */
 
     //Connect via string
-    cout << YELLOW_BOLD_TEXT << "[INFO] CONNECTING TO " << QuadCopter::vehicle_type << RESET_TEXT << endl;
+    cout << YELLOW_BOLD_TEXT << "[INFO] CONNECTING TO " << UAV::vehicle_name << RESET_TEXT << endl;
 
     mavsdk::ConnectionResult connection_result = mavsdk.add_any_connection(connection_url);
 
     if (connection_result != mavsdk::ConnectionResult::Success) 
     {
         cerr << "Connection Failed" << endl;
-        return false;
+        return FlightStatus::FAILED;
     }
 
-    //Find Quadcopter in system array
+    //Find UAV in system array
     cout << YELLOW_BOLD_TEXT << "[INFO] WAITING FOR SYSTEM..." << RESET_TEXT << endl;
 
     while (mavsdk.systems().size() == 0)
@@ -44,34 +54,33 @@ bool QuadCopter::connect(const std::string& connection_url)
     //Declare pluguin variables if connection succeeded
     if (!system->is_connected())
     {
-        cerr << "Connection to " << QuadCopter::vehicle_type << " Failed" << endl;
-        return false;
+        cerr << "Connection to " << UAV::vehicle_name << " Failed" << endl;
+        return FlightStatus::FAILED;
     }
 
     else
     {
-        cout << GREEN_BOLD_TEXT << "[INFO] CONNECTED TO "<< QuadCopter::vehicle_type << RESET_TEXT << endl;
-        QuadCopter::action = std::make_shared<mavsdk::Action>(system);
-        QuadCopter::telemetry = std::make_shared<mavsdk::Telemetry>(system);
-        return true;
+        cout << GREEN_BOLD_TEXT << "[INFO] CONNECTED TO "<< UAV::vehicle_name << RESET_TEXT << endl;
+        UAV::action = std::make_shared<mavsdk::Action>(system);
+        UAV::telemetry = std::make_shared<mavsdk::Telemetry>(system);
+        return FlightStatus::FINISHED;
     }
 }
 
-bool QuadCopter::arm()
+FlightStatus UAV::arm()
 {
     // TODO: Verify calibrations before performing arm
 
     cout << YELLOW_BOLD_TEXT << "[INFO] PERFORMING PRE FLIGHT CHECK" << RESET_TEXT << endl;
 
-    while (!telemetry->health_all_ok())
+    while (!UAV::telemetry->health_all_ok())
     {
-
         cout << RED_BOLD_TEXT << "Vehicle not ready to arm. Waiting on:" << RESET_TEXT << '\n';
 
-        if (!QuadCopter::telemetry->health().is_global_position_ok) {
+        if (!UAV::telemetry->health().is_global_position_ok) {
             cerr << "-> GPS health." << endl;
         }
-        if (!QuadCopter::telemetry->health().is_home_position_ok){
+        if (!UAV::telemetry->health().is_home_position_ok){
             cerr << "-> Home position to be set" << endl;
         }
         this_thread::sleep_for(std::chrono::seconds(1));
@@ -79,53 +88,81 @@ bool QuadCopter::arm()
 
     cout << YELLOW_BOLD_TEXT << "[INFO] ARMING..." << RESET_TEXT << endl;
 
-    const mavsdk::Action::Result armed = QuadCopter::action->arm();
+    const mavsdk::Action::Result armed = UAV::action->arm();
 
     this_thread::sleep_for(chrono::seconds(3));
 
     if (armed != mavsdk::Action::Result::Success)
     {
         cerr << "Failed Arming" << armed << endl;
-        return false;
+        return FlightStatus::FAILED;
     }
 
     else
     {
-        cout << GREEN_BOLD_TEXT << "[INFO] " << QuadCopter::vehicle_type << " ARMED SUCCESSFULLY" << RESET_TEXT << endl;
-        return true;
+        cout << GREEN_BOLD_TEXT << "[INFO] " << UAV::vehicle_name << " ARMED SUCCESSFULLY" << RESET_TEXT << endl;
+        return FlightStatus::FINISHED;
     }
 }
 
-bool QuadCopter::takeoff(double target_height)
+FlightStatus UAV::takeoff(double target_height)
 {
     /*
         Perform takeoff given a determined height
     */
 
     // Setting takeoff altitude 
-    QuadCopter::action->set_takeoff_altitude(target_height);
+    UAV::action->set_takeoff_altitude(target_height);
 
-    if (QuadCopter::arm())
+    if (UAV::arm() == FlightStatus::FINISHED)
     {
-        cout << GREEN_BOLD_TEXT << "[INFO] TAKING OFF!" << RESET_TEXT << '\n';
-        const mavsdk::Action::Result flying = QuadCopter::action->takeoff();
+        cout << YELLOW_BOLD_TEXT << "[INFO] TAKING OFF..." << RESET_TEXT << '\n';
+        const mavsdk::Action::Result flying = UAV::action->takeoff();
 
         if (flying != mavsdk::Action::Result::Success)
         {
             cerr << "Takeoff Failed" << flying << endl;
-            return false;
+            return FlightStatus::FAILED;
         }
         else
         {
-            while (QuadCopter::telemetry->position().relative_altitude_m < target_height)
+            /*
+                This guarantees that the takeoff will be finished before leaving the method
+            */
+            while (UAV::telemetry->position().relative_altitude_m < target_height)
             {
                 this_thread::sleep_for(chrono::seconds(1));
             }
+            cout << GREEN_BOLD_TEXT << "[INFO]" << UAV::vehicle_name << " finished climbing" << RESET_TEXT << endl;
+            return FlightStatus::FINISHED;
         }
     }
     else
     {
-        return false;
+        return FlightStatus::FAILED;
     }
-    return false;
 }
+
+FlightStatus UAV::land()
+{
+    cout << YELLOW_BOLD_TEXT << "[INFO] Landing..." << RESET_TEXT << endl;
+    const mavsdk::Action::Result landing = UAV::action->land();
+
+    if (landing == mavsdk::Action::Result::Success)
+    {
+        if (UAV::telemetry->armed())
+        {
+            return FlightStatus::IN_PROGRESS;
+        }
+        cout << GREEN_BOLD_TEXT << "[INFO]" << UAV::vehicle_name << " landed successfully" << RESET_TEXT << endl;
+        return FlightStatus::FINISHED;
+    }
+    else
+    {
+        cerr << "Landing failed" << endl;
+        return FlightStatus::FAILED;
+    }
+}
+
+
+
