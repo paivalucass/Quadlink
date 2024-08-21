@@ -1,3 +1,3 @@
 # Quadlink
-Quadcopter UAV autonomous movement library.
+UAV autonomous movement library.
 
