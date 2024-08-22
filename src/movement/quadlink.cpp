@@ -2,6 +2,7 @@
 #include "format.h"
 #include <iostream>
 #include <mavsdk/mavsdk.h>
+#include <mavlink/common/mavlink.h>
 #include <mavsdk/plugins/action/action.h>
 #include <mavsdk/plugins/telemetry/telemetry.h>
 #include <thread>
@@ -143,19 +144,27 @@ FlightStatus UAV::takeoff(double target_height)
     }
 }
 
-FlightStatus UAV::land()
+FlightStatus UAV::land(bool check)
 {
-    cout << YELLOW_BOLD_TEXT << "[INFO] Landing..." << RESET_TEXT << endl;
-    const mavsdk::Action::Result landing = UAV::action->land();
-
-    if (landing == mavsdk::Action::Result::Success)
+    if (check)
     {
         if (UAV::telemetry->armed())
         {
             return FlightStatus::IN_PROGRESS;
         }
-        cout << GREEN_BOLD_TEXT << "[INFO]" << UAV::vehicle_name << " landed successfully" << RESET_TEXT << endl;
-        return FlightStatus::FINISHED;
+        else
+        {
+            cout << GREEN_BOLD_TEXT << "[INFO]" << UAV::vehicle_name << " landed successfully" << RESET_TEXT << endl;
+            return FlightStatus::FINISHED;
+        }
+    }
+
+    cout << YELLOW_BOLD_TEXT << "[INFO] Landing..." << RESET_TEXT << endl;
+    const mavsdk::Action::Result landing = UAV::action->land();
+
+    if (landing == mavsdk::Action::Result::Success)
+    {
+        return FlightStatus::IN_PROGRESS;
     }
     else
     {
@@ -164,5 +173,7 @@ FlightStatus UAV::land()
     }
 }
 
+FlightStatus UAV::go_to_relative(double x, double y, double z)
+{
 
-
+}
