@@ -4,6 +4,7 @@
 #include <string>
 #include <memory>
 #include <mavsdk/mavsdk.h>
+#include <mavlink/common/mavlink.h>
 #include <mavsdk/plugins/action/action.h>
 #include <mavsdk/plugins/telemetry/telemetry.h>
 
@@ -27,6 +28,8 @@ namespace quadlink {
         // Constructor of the UAV class
         UAV(const mavsdk::Mavsdk::Configuration& config, Vehicle vehicle_type);
 
+        ~UAV();
+
         // Connect the drone via UDP, TCP, Serial
         FlightStatus connect(const std::string& connection_url);
 
@@ -37,12 +40,17 @@ namespace quadlink {
         FlightStatus takeoff(double target_height);
 
         // Perform land
-        FlightStatus land();
+        FlightStatus land(bool check);
+
+        // Go to a pre defined position
+        FlightStatus go_to_relative(double x, double y, double z);
 
         // Obtain battery level
         void get_battery_status();
 
     private:
+        uint8_t system_id;
+        uint8_t component_id;
         Vehicle vehicle_type;
         std::string vehicle_name;
         mavsdk::Mavsdk mavsdk;
