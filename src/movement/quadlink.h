@@ -7,6 +7,10 @@
 #include <mavlink/common/mavlink.h>
 #include <mavsdk/plugins/action/action.h>
 #include <mavsdk/plugins/telemetry/telemetry.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <cmath>
 
 namespace quadlink {
 
@@ -49,8 +53,6 @@ namespace quadlink {
         void get_battery_status();
 
     private:
-        uint8_t system_id;
-        uint8_t component_id;
         Vehicle vehicle_type;
         std::string vehicle_name;
         mavsdk::Mavsdk mavsdk;
