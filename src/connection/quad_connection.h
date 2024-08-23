@@ -11,17 +11,23 @@
 #include <unistd.h>
 #include <cmath>
 
-
 namespace quadlink {
+    enum class ConnectionStatus{
+        Success,
+        Failed,
+        Timeout
+    };
+
     class QuadConnector
     {
     public:
-        QuadConnector(mavsdk::System& system);
+        QuadConnector();
 
-
+        ConnectionStatus connect_udp(std::string& connection_url);
     private:
-        mavsdk::System& _system;
+        std::vector<std::string> connection_url;
         int sockfd;
+        struct sockaddr_in server_addr;
         struct sockaddr_in drone_addr;
         uint8_t system_id;
         uint8_t component_id;

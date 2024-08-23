@@ -16,8 +16,8 @@
 using namespace quadlink;
 using namespace std; 
 
-UAV::UAV(const mavsdk::Mavsdk::Configuration& config, Vehicle Vehicle_type) : mavsdk(config), vehicle_type(vehicle_type) {
-
+UAV::UAV(const mavsdk::Mavsdk::Configuration& config, Vehicle Vehicle_type) : mavsdk(config), vehicle_type(vehicle_type)  {
+    
     switch (vehicle_type)
     {
     case Vehicle::QuadCopter:

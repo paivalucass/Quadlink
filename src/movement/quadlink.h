@@ -53,8 +53,10 @@ namespace quadlink {
         void get_battery_status();
 
     private:
+        // QuadConnector connector;
         Vehicle vehicle_type;
         std::string vehicle_name;
+        std::string connection_url;
         mavsdk::Mavsdk mavsdk;
         std::shared_ptr<mavsdk::Action> action;
         std::shared_ptr<mavsdk::Telemetry> telemetry;
