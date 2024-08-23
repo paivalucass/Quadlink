@@ -5,18 +5,19 @@ project(quadlink)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(MAVSDK REQUIRED
-             MAVLink REQUIRED)
+# Encontre e configure o MAVSDK
+find_package(MAVSDK REQUIRED)
 
+# Inclua os diretórios necessários
 include_directories(${MAVSDK_INCLUDE_DIRS})
 
-include_directories(../mavlink/install/include)
+# Inclua o caminho para os arquivos de cabeçalho do MAVLink
+include_directories(${CMAKE_SOURCE_DIR}/../mavlink/install/include)
 
-add_executable(quadlink src/movement/quadlink.cpp)
+# Adicione o executável
+add_executable(quadlink src/movement/test.cpp)
 
+# Vincule o MAVSDK ao seu projeto
 target_link_libraries(quadlink 
     MAVSDK::mavsdk
-    mavlink
-    # MAVSDK::mavsdk_action
-    # MAVSDK::mavsdk_telemetry
 )

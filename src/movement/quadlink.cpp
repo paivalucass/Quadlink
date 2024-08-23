@@ -1,4 +1,5 @@
 #include "quadlink.h"
+#include "../connection/quad_connection.h"
 #include "format.h"
 #include <iostream>
 #include <mavsdk/mavsdk.h>
@@ -7,11 +8,16 @@
 #include <mavsdk/plugins/telemetry/telemetry.h>
 #include <thread>
 #include <chrono>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <cmath>
 
 using namespace quadlink;
 using namespace std; 
 
 UAV::UAV(const mavsdk::Mavsdk::Configuration& config, Vehicle Vehicle_type) : mavsdk(config), vehicle_type(vehicle_type) {
+
     switch (vehicle_type)
     {
     case Vehicle::QuadCopter:
@@ -22,6 +28,7 @@ UAV::UAV(const mavsdk::Mavsdk::Configuration& config, Vehicle Vehicle_type) : ma
     default:
         break;
     }
+
 }
 
 FlightStatus UAV::connect(const std::string& connection_url)
@@ -61,6 +68,10 @@ FlightStatus UAV::connect(const std::string& connection_url)
 
     else
     {
+        // UAV::system_id = system->get_system_id();
+        // Component ID is different depending on the message, a way to handle this will be added soon.
+        // UAV::target_system_id = system->get_system_id();
+        // Target component ID is different depending on the message, a way to handle this will be added soon.
         cout << GREEN_BOLD_TEXT << "[INFO] CONNECTED TO "<< UAV::vehicle_name << RESET_TEXT << endl;
         UAV::action = std::make_shared<mavsdk::Action>(system);
         UAV::telemetry = std::make_shared<mavsdk::Telemetry>(system);
@@ -117,7 +128,7 @@ FlightStatus UAV::takeoff(double target_height)
 
     if (UAV::arm() == FlightStatus::FINISHED)
     {
-        cout << YELLOW_BOLD_TEXT << "[INFO] TAKING OFF..." << RESET_TEXT << '\n';
+        cout << YELLOW_BOLD_TEXT << "[INFO] TAKING OFF..." << RESET_TEXT << endl;
         const mavsdk::Action::Result flying = UAV::action->takeoff();
 
         if (flying != mavsdk::Action::Result::Success)
@@ -171,9 +182,4 @@ FlightStatus UAV::land(bool check)
         cerr << "Landing failed" << endl;
         return FlightStatus::FAILED;
     }
-}
-
-FlightStatus UAV::go_to_relative(double x, double y, double z)
-{
-
 }
