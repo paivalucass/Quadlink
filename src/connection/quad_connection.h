@@ -11,7 +11,12 @@
 #include <unistd.h>
 #include <cmath>
 
+
+#define TIMEOUT_SECONDS 5;
+#define TIMEOUT_MILISECONDS 0;
+
 namespace quadlink {
+
     enum class ConnectionStatus{
         Success,
         Failed,
@@ -23,7 +28,12 @@ namespace quadlink {
     public:
         QuadConnector();
 
-        ConnectionStatus connect_udp(std::string& connection_url);
+        quadlink::ConnectionStatus connect_udp(std::string& connection_url);
+
+        quadlink::ConnectionStatus check_message(const uint8_t* buffer, ssize_t size, uint8_t target_ID);
+
+        
+        
     private:
         std::vector<std::string> connection_url;
         int sockfd;
