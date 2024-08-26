@@ -8,55 +8,15 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <cstring>
-
-using namespace mavsdk;
-using namespace std;
+#include "../connection/quad_connection.h"
 
 
 int main() {
-    string connection_url = "127.0.0.1";
-    int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-    
-    if (sockfd < 0) {
-        perror("socket creation failed");
-        return 1;
-    }
+    quadlink::QuadConnector connector;
+    std::string connection_url = "127.0.0.1:14562";
+    std::cout << "começou" << std::endl;
+    connector.connect_udp(connection_url);
 
-    struct sockaddr_in server_addr;
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(14562);
-    server_addr.sin_addr.s_addr = htonl(INADDR_ANY); // Bind to all interfaces
-
-    if (bind(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
-        perror("bind failed");
-        close(sockfd);
-        return 1;
-    }
-
-    uint8_t buffer[2048];
-    sockaddr_in drone_addr;
-    socklen_t addr_len = sizeof(drone_addr);
-
-    cout << "Waiting for messages..." << endl;
-    ssize_t len = recvfrom(sockfd, buffer, sizeof(buffer), 0, (struct sockaddr *)&drone_addr, &addr_len);
-
-    if (len < 0) {
-        perror("recvfrom failed");
-    } else {
-        cout << "Message received, length: " << len << endl;
-        mavlink_message_t msg;
-        mavlink_status_t status;
-        // Decode the MAVLink message
-        for (ssize_t i = 0; i < len; ++i) {
-            if (mavlink_parse_char(MAVLINK_COMM_0, buffer[i], &msg, &status)) {
-                if (msg.msgid == MAVLINK_MSG_ID_HEARTBEAT) {
-                    cout << "Heartbeat received from drone." << endl;
-                }
-            }
-        }
-    }
-
-    close(sockfd);
     return 0;
 }
 
