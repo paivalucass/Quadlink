@@ -12,22 +12,42 @@
 #include <unistd.h>
 #include <cmath>
 #include "utils/strings.cpp"
+#include "utils/mav_messages.cpp"
 #include <iostream>
 
+namespace quadlink{
 
-quadlink::QuadConnector::QuadConnector() 
+quadlink::QuadConnector::QuadConnector() {}
+
+quadlink::ConnectionStatus quadlink::QuadConnector::check_message(const uint8_t* buffer, ssize_t size, uint8_t target_ID)
 {
-}
+    mavlink_message_t msg;
+    mavlink_status_t status;
 
+    for (ssize_t i = 0; i < size; ++i) {
+        if (mavlink_parse_char(MAVLINK_COMM_0, buffer[i], &msg, &status)) {
+            if (msg.msgid == target_ID) {
+                if (target_ID == MAVLINK_MSG_ID_HEARTBEAT){
+                    quadlink::QuadConnector::target_system_id = msg.sysid;
+                    quadlink::QuadConnector::system_id = msg.sysid;
+                }
+                return quadlink::ConnectionStatus::Success;
+            }
+        }
+    }
+
+    return quadlink::ConnectionStatus::Failed;
+}
 
 quadlink::ConnectionStatus quadlink::QuadConnector::connect_udp(std::string& connection_url)
 {
     /*
-        Identifies the drone in the given IP/PORT and verifies the heartbet.
+        Identifies the drone in the given IP/PORT and verifies the heartbeat.
     */
-    QuadConnector::connection_url = split_string(connection_url, ':');
-    string ip_url = QuadConnector::connection_url[0];
-    string port_url = QuadConnector::connection_url[1];
+
+    quadlink::QuadConnector::connection_url = split_string(connection_url, ':');
+    std::string ip_url = QuadConnector::connection_url[0];
+    std::string port_url = QuadConnector::connection_url[1];
 
     u_int16_t port = string_to_int16(port_url);
     
@@ -36,17 +56,32 @@ quadlink::ConnectionStatus quadlink::QuadConnector::connect_udp(std::string& con
     if (quadlink::QuadConnector::sockfd < 0)
     {
         close(quadlink::QuadConnector::sockfd);
-        cerr << "Failed creating socket" << endl;
+        std::cerr << "Failed creating socket" << std::endl;
         return quadlink::ConnectionStatus::Failed;
     }
 
+    struct timeval timeout;
+    timeout.tv_sec = TIMEOUT_SECONDS; 
+    timeout.tv_usec = TIMEOUT_MILISECONDS;           
+
+    if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
+        perror("setsockopt");
+        close(sockfd);
+        return quadlink::ConnectionStatus::Failed;
+    }
+
+    /*
+        Binding socket to the determined port.
+    */
+
     quadlink::QuadConnector::server_addr.sin_family = AF_INET;
     quadlink::QuadConnector::server_addr.sin_port = htons(port);
-    quadlink::QuadConnector::server_addr.sin_addr.s_addr = htonl(INADDR_ANY); // Bind to all interfaces
+    // TODO: BIND ONLY TO THE SPECIFIED IP IN URL (CURRENTLY BINDING TO ALL)
+    quadlink::QuadConnector::server_addr.sin_addr.s_addr = htonl(INADDR_ANY); // Bind to all interfaces 
 
     if (bind(quadlink::QuadConnector::sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
         close(quadlink::QuadConnector::sockfd);
-        cerr << "Failed binding socket" << endl;
+        std::cerr << "Failed binding socket" << std::endl;
         return quadlink::ConnectionStatus::Failed;
     }
 
@@ -54,26 +89,21 @@ quadlink::ConnectionStatus quadlink::QuadConnector::connect_udp(std::string& con
     sockaddr_in drone_addr;
     socklen_t addr_len = sizeof(drone_addr);
 
+    /*
+        Receive a message.
+    */
+
     ssize_t len = recvfrom(quadlink::QuadConnector::sockfd, buffer, sizeof(buffer), 0, (struct sockaddr *)&drone_addr, &addr_len);
 
     if (len < 0) {
-        close(sockfd);
-        return quadlink::ConnectionStatus::Failed;
+        close(quadlink::QuadConnector::sockfd);
+        return quadlink::ConnectionStatus::Timeout;
     } else {
-        cout << "Message received, length: " << len << endl;
-        mavlink_message_t msg;
-        mavlink_status_t status;
-        // Decode the MAVLink message
-        for (ssize_t i = 0; i < len; ++i) {
-            if (mavlink_parse_char(MAVLINK_COMM_0, buffer[i], &msg, &status)) {
-                if (msg.msgid == MAVLINK_MSG_ID_HEARTBEAT) {
-                    close(sockfd);
-                    return quadlink::ConnectionStatus::Success;
-                }
-            }
-        }
+        // TODO: Parametrize buffer size somehow
+        return quadlink::QuadConnector::check_message(buffer, 2048, MAVLINK_MSG_ID_HEARTBEAT);
     }
 
-    close(sockfd);
+    close(quadlink::QuadConnector::sockfd);
     return quadlink::ConnectionStatus::Failed;
+}
 }

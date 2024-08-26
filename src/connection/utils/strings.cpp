@@ -6,13 +6,11 @@
 #include <iostream>
 
 
-using namespace std;
-
-vector<string> split_string(std::string word, char delimiter)
+std::vector<std::string> split_string(std::string word, char delimiter)
 {
-    vector<string> result;
-    string token;
-    istringstream tokens(word);
+    std::vector<std::string> result;
+    std::string token;
+    std::istringstream tokens(word);
 
     while (getline(tokens, token, delimiter))
     {
@@ -22,7 +20,7 @@ vector<string> split_string(std::string word, char delimiter)
     return result;
 }
 
-uint16_t string_to_int16(string word)
+uint16_t string_to_int16(std::string word)
 {
     int number = std::stoi(word);  // Converter para int
 

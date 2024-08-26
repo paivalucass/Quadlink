@@ -12,10 +12,6 @@
 using namespace mavsdk;
 using namespace std;
 
-bool check_heartbeat()
-{
-
-};
 
 int main() {
     string connection_url = "127.0.0.1";
