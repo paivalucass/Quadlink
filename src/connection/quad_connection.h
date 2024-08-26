@@ -2,14 +2,12 @@
 
 #include <string>
 #include <memory>
-#include <mavsdk/mavsdk.h>
 #include <mavlink/common/mavlink.h>
-#include <mavsdk/plugins/action/action.h>
-#include <mavsdk/plugins/telemetry/telemetry.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <cmath>
+#include <utils/clock.h>
 
 
 #define TIMEOUT_SECONDS 5;
@@ -28,13 +26,20 @@ namespace quadlink {
     public:
         QuadConnector();
 
+        /*
+        Identifies the drone in the given IP/PORT and verifies the heartbeat.
+        Waits 5 seconds for the heartbet.
+        If heartbeat not found, returns a quadlink::ConnectionStatus::Timeout.
+        */
         quadlink::ConnectionStatus connect_udp(std::string& connection_url);
 
+        /*
+        Checks if a message is from the given mavlink ID.
+        */
         quadlink::ConnectionStatus check_message(const uint8_t* buffer, ssize_t size, uint8_t target_ID);
-
-        
         
     private:
+        quadlink::Clock Clock;
         std::vector<std::string> connection_url;
         int sockfd;
         struct sockaddr_in server_addr;
