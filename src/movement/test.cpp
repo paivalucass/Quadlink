@@ -14,7 +14,6 @@
 int main() {
     quadlink::QuadConnector connector;
     std::string connection_url = "127.0.0.1:14562";
-    std::cout << "começou" << std::endl;
     connector.connect_udp(connection_url);
 
     return 0;

@@ -14,11 +14,11 @@
 
 namespace quadlink{
 
-quadlink::QuadConnector::QuadConnector() : Clock()
-{;
+quadlink::QuadConnector::QuadConnector()
+{
 }
 
-quadlink::ConnectionStatus quadlink::QuadConnector::check_message(const uint8_t* buffer, ssize_t size, uint8_t target_ID)
+quadlink::ConnectionStatus quadlink::QuadConnector::check_message(const uint8_t* buffer, ssize_t size, uint16_t target_ID)
 {
     mavlink_message_t msg;
     mavlink_status_t status;
@@ -49,7 +49,6 @@ quadlink::ConnectionStatus quadlink::QuadConnector::connect_udp(std::string& con
 
 
     // TODO: a method for socket creation/binding should be implemented later
-    std::cout << "entrou" << std::endl;
     quadlink::QuadConnector::connection_url = split_string(connection_url, ':');
     std::string ip_url = quadlink::QuadConnector::connection_url[0];
     std::string port_url = quadlink::QuadConnector::connection_url[1];
@@ -57,7 +56,6 @@ quadlink::ConnectionStatus quadlink::QuadConnector::connect_udp(std::string& con
     u_int16_t port = string_to_int16(port_url);
     
     quadlink::QuadConnector::sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-    std::cout << "entrou" << std::endl;
 
     if (quadlink::QuadConnector::sockfd < 0)
     {
@@ -92,21 +90,25 @@ quadlink::ConnectionStatus quadlink::QuadConnector::connect_udp(std::string& con
     }
 
     uint8_t buffer[2048];
-    sockaddr_in drone_addr;
-    socklen_t addr_len = sizeof(drone_addr);
+    // TODO: How to instanciate this?
+    socklen_t addr_len = sizeof(quadlink::QuadConnector::drone_addr);
 
     /*
         Wait for heartbeat
         It will wait 5 seconds
     */
 
-    // Reset Clock choronometer
-    quadlink::QuadConnector::Clock.reset();
+    // Reset clock choronometer
+    quadlink::QuadConnector::clock.reset();
 
     quadlink::ConnectionStatus check = quadlink::ConnectionStatus::Failed;
 
-    while (quadlink::QuadConnector::Clock.watch() < 5.0 && check == quadlink::ConnectionStatus::Failed)
+    while (quadlink::QuadConnector::clock.watch() < 5.0 && check != quadlink::ConnectionStatus::Success)
     {
+        std::fill(std::begin(buffer), std::end(buffer), 0);
+        /*
+            recvfrom stores the address info into drone_addr
+        */
         ssize_t len = recvfrom(quadlink::QuadConnector::sockfd, buffer, sizeof(buffer), 0, (struct sockaddr *)&drone_addr, &addr_len);
 
         if (len < 0) {
@@ -114,7 +116,7 @@ quadlink::ConnectionStatus quadlink::QuadConnector::connect_udp(std::string& con
             return quadlink::ConnectionStatus::Timeout;
         } else {
             // TODO: Parametrize buffer size somehow
-            quadlink::ConnectionStatus check = quadlink::QuadConnector::check_message(buffer, 2048, MAVLINK_MSG_ID_HEARTBEAT);
+            check = quadlink::QuadConnector::check_message(buffer, 2048, MAVLINK_MSG_ID_HEARTBEAT);
         }
     }
     
@@ -124,5 +126,14 @@ quadlink::ConnectionStatus quadlink::QuadConnector::connect_udp(std::string& con
     }
     close(quadlink::QuadConnector::sockfd);
     return quadlink::ConnectionStatus::Timeout;
+}
+
+quadlink::ConnectionStatus quadlink::QuadConnector::send_mav_message(mavlink_message_t &msg)
+{
+    // TODO: Parametrize buffer size
+    uint8_t buffer[1024];
+    int len = mavlink_msg_to_send_buffer(buffer, &msg);
+    sendto(quadlink::QuadConnector::sockfd, buffer, len, 0, (struct sockaddr*)&drone_addr, sizeof(drone_addr));  
+    
 }
 }

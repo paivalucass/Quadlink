@@ -2,10 +2,6 @@
 
 #include <string>
 #include <memory>
-#include <mavlink/common/mavlink.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <unistd.h>
 #include <cmath>
 #include <chrono>
 
