@@ -40,8 +40,20 @@ FlightStatus UAV::connect(std::string& connection_url)
     //Connect via string
     std::cout << YELLOW_BOLD_TEXT << "[INFO] CONNECTING TO " << UAV::vehicle_name << RESET_TEXT << std::endl;
 
-    quadlink::UAV::connection.connect_udp(connection_url);
+    quadlink::ConnectionStatus check = quadlink::UAV::connection.connect_udp(connection_url);
     
+    if (check == quadlink::ConnectionStatus::Success)
+    {
+        std::cout << GREEN_BOLD_TEXT << "[INFO] " << UAV::vehicle_name << " CONNECTED SUCCESSFULLY" << RESET_TEXT << std::endl;
+    }
+    else if (check == quadlink::ConnectionStatus::Failed)
+    {
+        std::cerr << "[INFO] " << UAV::vehicle_name << " FAILED CONNECTING" << RESET_TEXT << std::endl;
+    }
+    else
+    {
+        std::cout << RED_BOLD_TEXT << "[INFO] " << UAV::vehicle_name << " CONNECTION TIMEOUT" << RESET_TEXT << std::endl;
+    }
 }
 
 FlightStatus UAV::arm()
