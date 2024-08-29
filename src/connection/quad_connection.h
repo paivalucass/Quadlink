@@ -25,10 +25,17 @@ namespace quadlink {
         Timeout
     };
 
+    typedef struct{
+        ConnectionStatus connection;
+        mavlink_command_ack_t ack;
+    } MessageStatus;
+
     class QuadConnector
     {
     public:
         QuadConnector();
+
+        ~QuadConnector() = default;
 
         /*
         Identifies the drone in the given IP/PORT and verifies the heartbeat.
@@ -38,24 +45,30 @@ namespace quadlink {
         quadlink::ConnectionStatus connect_udp(std::string& connection_url);
 
         /*
-        Create a socket.
+        Create a socket binded to the given URL info.
         */
         quadlink::ConnectionStatus create_socket(std::string& connection_url);
 
         /*
         Checks if a message is from the given mavlink ID.
         */
-        quadlink::ConnectionStatus check_message(const uint8_t* buffer, ssize_t size, uint16_t target_ID);
+        quadlink::MessageStatus check_message(const uint8_t* buffer, ssize_t size, uint16_t target_ID);
 
         /*
         Wait for a given mavlink message to be received.
         */
-        quadlink::ConnectionStatus wait_message(uint16_t target_ID, double time_waiting);
+        quadlink::MessageStatus wait_message(uint16_t target_ID, double time_waiting);
 
         /*
         Sends a mavlink message to the last drone url connected.
         */
-        quadlink::ConnectionStatus send_mav_message(mavlink_message_t &msg);
+        quadlink::ConnectionStatus send_mav_message(mavlink_command_long_t &msg);
+
+        /*
+        Appends the system ID and component ID, creating the message after.
+        */
+        mavlink_message_t build_message(mavlink_command_long_t &msg);
+
         
     private:
         quadlink::Clock clock;
@@ -68,4 +81,4 @@ namespace quadlink {
         uint8_t target_system_id;
         uint8_t target_component_id;
     };
-}
+};
