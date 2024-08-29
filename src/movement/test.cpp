@@ -10,7 +10,6 @@
 #include <cstring>
 #include "../connection/quad_connection.h"
 
-
 int main() {
     quadlink::QuadConnector connector;
     std::string connection_url = "127.0.0.1:14562";
