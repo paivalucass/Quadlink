@@ -16,6 +16,7 @@ int main() {
     quadlink::UAV quadcopter(vehicle);
     std::string connection_url = "127.0.0.1:14562";
     quadlink::FlightStatus status = quadcopter.connect(connection_url);
+    status = quadcopter.arm();
     return 0;
 }
 
