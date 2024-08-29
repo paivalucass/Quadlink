@@ -9,12 +9,13 @@
 #include <unistd.h>
 #include <cstring>
 #include "../connection/quad_connection.h"
+#include "quadlink.h"
 
 int main() {
-    quadlink::QuadConnector connector;
+    quadlink::Vehicle vehicle = quadlink::Vehicle::QuadCopter;
+    quadlink::UAV quadcopter(vehicle);
     std::string connection_url = "127.0.0.1:14562";
-    connector.connect_udp(connection_url);
-
+    quadlink::FlightStatus status = quadcopter.connect(connection_url);
     return 0;
 }
 
