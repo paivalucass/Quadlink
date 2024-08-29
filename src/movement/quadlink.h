@@ -7,6 +7,7 @@
 #include <mavlink/common/mavlink.h>
 #include <mavsdk/plugins/action/action.h>
 #include <mavsdk/plugins/telemetry/telemetry.h>
+#include "../connection/quad_connection.h"
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
@@ -35,7 +36,7 @@ namespace quadlink {
         ~UAV();
 
         // Connect the drone via UDP, TCP, Serial
-        FlightStatus connect(const std::string& connection_url);
+        FlightStatus connect(std::string& connection_url);
 
         // Do pre flight check and perform arm
         FlightStatus arm();
@@ -53,7 +54,7 @@ namespace quadlink {
         void get_battery_status();
 
     private:
-        // QuadConnector connector;
+        quadlink::QuadConnector connection;
         Vehicle vehicle_type;
         std::string vehicle_name;
         std::string connection_url;

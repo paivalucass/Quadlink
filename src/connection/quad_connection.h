@@ -38,11 +38,22 @@ namespace quadlink {
         quadlink::ConnectionStatus connect_udp(std::string& connection_url);
 
         /*
+        Create a socket.
+        */
+        quadlink::ConnectionStatus create_socket(std::string& connection_url);
+
+        /*
         Checks if a message is from the given mavlink ID.
         */
         quadlink::ConnectionStatus check_message(const uint8_t* buffer, ssize_t size, uint16_t target_ID);
 
         /*
+        Wait for a given mavlink message to be received.
+        */
+        quadlink::ConnectionStatus wait_message(uint16_t target_ID, double time_waiting);
+
+        /*
+        Sends a mavlink message to the last drone url connected.
         */
         quadlink::ConnectionStatus send_mav_message(mavlink_message_t &msg);
         
