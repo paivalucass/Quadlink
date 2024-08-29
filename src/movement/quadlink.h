@@ -22,7 +22,8 @@ namespace quadlink {
     enum class FlightStatus {
         IN_PROGRESS,
         FAILED,
-        FINISHED
+        FINISHED,
+        TIMEOUT
     };
 
     /*
@@ -31,9 +32,10 @@ namespace quadlink {
     class UAV {
     public:
         // Constructor of the UAV class
-        UAV(const mavsdk::Mavsdk::Configuration& config, Vehicle vehicle_type);
+        UAV(Vehicle vehicle_type);
 
-        ~UAV();
+        // Destructor (currently default but should be created futher on when dynamic allocation is used!)
+        ~UAV() = default;
 
         // Connect the drone via UDP, TCP, Serial
         FlightStatus connect(std::string& connection_url);
@@ -58,7 +60,6 @@ namespace quadlink {
         Vehicle vehicle_type;
         std::string vehicle_name;
         std::string connection_url;
-        mavsdk::Mavsdk mavsdk;
         std::shared_ptr<mavsdk::Action> action;
         std::shared_ptr<mavsdk::Telemetry> telemetry;
     };

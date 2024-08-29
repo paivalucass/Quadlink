@@ -30,7 +30,6 @@ quadlink::ConnectionStatus quadlink::QuadConnector::check_message(const uint8_t*
                     quadlink::QuadConnector::target_system_id = msg.sysid;
                     quadlink::QuadConnector::system_id = msg.sysid;
                 }
-                std::cout << "Message checked" << std::endl;
                 return quadlink::ConnectionStatus::Success;
             }
         }

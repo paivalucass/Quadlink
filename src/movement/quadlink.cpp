@@ -15,7 +15,7 @@
 
 namespace quadlink{
 
-UAV::UAV(const mavsdk::Mavsdk::Configuration& config, Vehicle Vehicle_type) : mavsdk(config), vehicle_type(vehicle_type), connection()  {
+UAV::UAV(Vehicle vehicle_type) : vehicle_type(vehicle_type), connection()  {
     
     switch (vehicle_type)
     {
@@ -45,14 +45,17 @@ FlightStatus UAV::connect(std::string& connection_url)
     if (check == quadlink::ConnectionStatus::Success)
     {
         std::cout << GREEN_BOLD_TEXT << "[INFO] " << UAV::vehicle_name << " CONNECTED SUCCESSFULLY" << RESET_TEXT << std::endl;
+        return quadlink::FlightStatus::FINISHED;
     }
     else if (check == quadlink::ConnectionStatus::Failed)
     {
         std::cerr << "[INFO] " << UAV::vehicle_name << " FAILED CONNECTING" << RESET_TEXT << std::endl;
+        return quadlink::FlightStatus::FAILED;
     }
     else
     {
         std::cout << RED_BOLD_TEXT << "[INFO] " << UAV::vehicle_name << " CONNECTION TIMEOUT" << RESET_TEXT << std::endl;
+        return quadlink::FlightStatus::TIMEOUT;
     }
 }
 
