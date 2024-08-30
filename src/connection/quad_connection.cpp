@@ -34,6 +34,7 @@ quadlink::MessageStatus quadlink::QuadConnector::check_message(uint16_t target_I
     for (ssize_t i = 0; i < quadlink::QuadConnector::buffer_size; ++i) {
         if (mavlink_parse_char(MAVLINK_COMM_0, quadlink::QuadConnector::buffer[i], &msg, &status)) {
             if (msg.msgid == target_ID) {
+                // TODO: Switch Case here?
                 if (target_ID == MAVLINK_MSG_ID_HEARTBEAT){
                     // CURRENTLY HARD CODED BUT CAN BE THE CAUSE OF FUTURE PROBLEMS WITH CONNECTION, THIS SHOULD BE CHANGED ASAP TO A MORE DYNAMIC APPROACH
                     quadlink::QuadConnector::target_system_id = msg.sysid;
@@ -43,6 +44,9 @@ quadlink::MessageStatus quadlink::QuadConnector::check_message(uint16_t target_I
                 }
                 else if (target_ID == MAVLINK_MSG_ID_COMMAND_ACK){
                     mavlink_msg_command_ack_decode(&msg, &return_status.ack);
+                }
+                else if (target_ID == MAVLINK_MSG_ID_SYS_STATUS){
+                    mavlink_msg_sys_status_decode(&msg, &return_status.sys);
                 }
                 return_status.connection = quadlink::ConnectionStatus::Success;
                 return return_status;

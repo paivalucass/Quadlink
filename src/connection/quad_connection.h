@@ -28,6 +28,8 @@ namespace quadlink {
     typedef struct{
         ConnectionStatus connection;
         mavlink_command_ack_t ack;
+        mavlink_sys_status_t sys;
+
     } MessageStatus;
 
     class QuadConnector
