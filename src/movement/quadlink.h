@@ -3,11 +3,18 @@
 
 #include <string>
 #include <memory>
+#include "quadlink.h"
+#include "../connection/quad_connection.h"
+#include "../telemetry/quad_telemetry.h"
+#include "../action/quad_action.h"
+#include "format.h"
+#include <iostream>
 #include <mavsdk/mavsdk.h>
 #include <mavlink/common/mavlink.h>
 #include <mavsdk/plugins/action/action.h>
 #include <mavsdk/plugins/telemetry/telemetry.h>
-#include "../connection/quad_connection.h"
+#include <thread>
+#include <chrono>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
@@ -29,7 +36,7 @@ namespace quadlink {
     /*
         This class should be adaptable to all vehicles.
     */
-    class UAV {
+    class UAV : public QuadTelemetry, public QuadAction{
     public:
         // Constructor of the UAV class
         UAV(Vehicle vehicle_type);
@@ -56,7 +63,7 @@ namespace quadlink {
         void get_battery_status();
 
     private:
-        std::shared_ptr<quadlink::QuadConnector> connection;
+        // std::shared_ptr<quadlink::QuadConnector> connection;
         // quadlink::QuadTelemetry q_telemetry;
         Vehicle vehicle_type;
         std::string vehicle_name;
