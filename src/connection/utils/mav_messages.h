@@ -11,5 +11,4 @@
 #include <iostream>
 
 
-
 // quadlink::ConnectionStatus check_message(const uint8_t* buffer, size_t size);

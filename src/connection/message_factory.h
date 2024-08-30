@@ -13,10 +13,15 @@
 #include "utils/clock.h"
 #include <iostream>
 #include <chrono>
+#include <cstring>
 
 namespace quadlink{
     class MessageFactory
     {
+        MessageFactory();
+
+        ~MessageFactory() = default;
+
         mavlink_command_long_t create_arm();
 
         mavlink_command_long_t create_takeoff();

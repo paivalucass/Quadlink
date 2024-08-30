@@ -2,7 +2,6 @@
 
 #include <string>
 #include <memory>
-#include "quad_connection.h"
 #include <mavlink/common/mavlink.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>

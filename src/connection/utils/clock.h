@@ -4,7 +4,7 @@
 #include <memory>
 #include <cmath>
 #include <chrono>
-
+#include "clock.h"
 
 
 namespace quadlink{

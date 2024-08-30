@@ -20,7 +20,8 @@ add_executable(quadlink src/movement/test.cpp
                         src/connection/quad_connection.cpp
                         src/connection/utils/strings.cpp
                         src/connection/utils/mav_messages.cpp
-                        src/connection/utils/clock.cpp)
+                        src/connection/utils/clock.cpp
+                        src/telemetry/quad_telemetry.cpp)
 
 # Vincule o MAVSDK ao seu projeto
 target_link_libraries(quadlink 
