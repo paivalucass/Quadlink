@@ -35,7 +35,7 @@ namespace quadlink {
     public:
         QuadConnector();
 
-        ~QuadConnector() = default;
+        ~QuadConnector();
 
         /*
         Identifies the drone in the given IP/PORT and verifies the heartbeat.
@@ -52,7 +52,7 @@ namespace quadlink {
         /*
         Checks if a message is from the given mavlink ID.
         */
-        quadlink::MessageStatus check_message(const uint8_t* buffer, ssize_t size, uint16_t target_ID);
+        quadlink::MessageStatus check_message(uint16_t target_ID);
 
         /*
         Wait for a given mavlink message to be received.
@@ -76,6 +76,8 @@ namespace quadlink {
         int sockfd;
         struct sockaddr_in server_addr;
         struct sockaddr_in drone_addr;
+        uint8_t* buffer;
+        size_t buffer_size;
         uint8_t system_id;
         uint8_t component_id;
         uint8_t target_system_id;
