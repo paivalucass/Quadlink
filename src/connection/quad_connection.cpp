@@ -15,18 +15,24 @@
 
 namespace quadlink{
 
-quadlink::QuadConnector::QuadConnector() : clock()
+quadlink::QuadConnector::QuadConnector() : clock() , buffer_size(2048)
 {
+    buffer = new uint8_t[buffer_size];
+    std::fill(buffer, buffer + buffer_size, 0);
 }
 
-quadlink::MessageStatus quadlink::QuadConnector::check_message(const uint8_t* buffer, ssize_t size, uint16_t target_ID)
+quadlink::QuadConnector::~QuadConnector(){
+    delete[] buffer;
+}
+
+quadlink::MessageStatus quadlink::QuadConnector::check_message(uint16_t target_ID)
 {
     mavlink_message_t msg;
     mavlink_status_t status;
     quadlink::MessageStatus return_status;
 
-    for (ssize_t i = 0; i < size; ++i) {
-        if (mavlink_parse_char(MAVLINK_COMM_0, buffer[i], &msg, &status)) {
+    for (ssize_t i = 0; i < quadlink::QuadConnector::buffer_size; ++i) {
+        if (mavlink_parse_char(MAVLINK_COMM_0, quadlink::QuadConnector::buffer[i], &msg, &status)) {
             if (msg.msgid == target_ID) {
                 if (target_ID == MAVLINK_MSG_ID_HEARTBEAT){
                     // CURRENTLY HARD CODED BUT CAN BE THE CAUSE OF FUTURE PROBLEMS WITH CONNECTION, THIS SHOULD BE CHANGED ASAP TO A MORE DYNAMIC APPROACH
@@ -94,7 +100,6 @@ quadlink::ConnectionStatus quadlink::QuadConnector::create_socket(std::string& c
 
 quadlink::MessageStatus quadlink::QuadConnector::wait_message(uint16_t target_ID, double time_waiting)
 {
-    uint8_t recv_buffer[2048];
     ssize_t recv_len;
     quadlink::MessageStatus status;
     status.connection = quadlink::ConnectionStatus::Failed;
@@ -110,17 +115,17 @@ quadlink::MessageStatus quadlink::QuadConnector::wait_message(uint16_t target_ID
 
     while (quadlink::QuadConnector::clock.watch() < time_waiting && status.connection != quadlink::ConnectionStatus::Success)
     {
-        std::fill(std::begin(recv_buffer), std::end(recv_buffer), 0);
+        std::fill(quadlink::QuadConnector::buffer, quadlink::QuadConnector::buffer + quadlink::QuadConnector::buffer_size, 0);
         /*
             recvfrom stores the address info into drone_addr
         */
-        recv_len = recvfrom(quadlink::QuadConnector::sockfd, recv_buffer, sizeof(recv_buffer), 0, (struct sockaddr *)&drone_addr, &addr_len);
+        recv_len = recvfrom(quadlink::QuadConnector::sockfd, quadlink::QuadConnector::buffer, quadlink::QuadConnector::buffer_size, 0, (struct sockaddr *)&drone_addr, &addr_len);
 
         if (recv_len < 0) {
             status.connection = quadlink::ConnectionStatus::Timeout;
             return status;
         } else {
-            status = quadlink::QuadConnector::check_message(recv_buffer, 2048, target_ID);
+            status = quadlink::QuadConnector::check_message(target_ID);
         }
     }
     
@@ -140,15 +145,11 @@ quadlink::ConnectionStatus quadlink::QuadConnector::connect_udp(std::string& con
         If heartbeat not found, returns a timeout.
     */
 
-
-    // TODO: a method for socket creation/binding should be implemented later
     quadlink::ConnectionStatus socket_check = quadlink::QuadConnector::create_socket(connection_url);
 
     /*
         Wait for heartbet mmessage (5 seconds)
     */
-
-    uint8_t buffer[2048];
 
     quadlink::MessageStatus message_status = wait_message(MAVLINK_MSG_ID_HEARTBEAT, 5.0);
 
@@ -171,16 +172,13 @@ quadlink::ConnectionStatus quadlink::QuadConnector::connect_udp(std::string& con
 quadlink::ConnectionStatus quadlink::QuadConnector::send_mav_message(mavlink_command_long_t &command)
 {   
     mavlink_message_t msg = quadlink::QuadConnector::build_message(command);
-    // TODO: Dynamic buffer size
-    uint8_t send_buffer[1024];
-    int len = mavlink_msg_to_send_buffer(send_buffer, &msg);
+    int len = mavlink_msg_to_send_buffer(quadlink::QuadConnector::buffer, &msg);
     quadlink::MessageStatus ack_status;
-    // TODO: Parametrize buffer size
 
     // Try three times to receive ACK
     for (int i = 0; i < 3; i ++)
     {
-        sendto(quadlink::QuadConnector::sockfd, send_buffer, len, 0, (struct sockaddr*)&drone_addr, sizeof(drone_addr));  
+        sendto(quadlink::QuadConnector::sockfd, quadlink::QuadConnector::buffer, len, 0, (struct sockaddr*)&drone_addr, sizeof(drone_addr));  
 
         ack_status = wait_message(MAVLINK_MSG_ID_COMMAND_ACK, 2.0);
         
