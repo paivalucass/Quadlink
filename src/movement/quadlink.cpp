@@ -15,7 +15,7 @@
 
 namespace quadlink{
 
-UAV::UAV(Vehicle vehicle_type) : vehicle_type(vehicle_type), connection()  {
+UAV::UAV(Vehicle vehicle_type) : vehicle_type(vehicle_type), connection(std::make_shared<quadlink::QuadConnector>())  {
     
     switch (vehicle_type)
     {
@@ -40,7 +40,7 @@ FlightStatus UAV::connect(std::string& connection_url)
     //Connect via string
     std::cout << YELLOW_BOLD_TEXT << "[INFO] CONNECTING TO " << UAV::vehicle_name << RESET_TEXT << std::endl;
 
-    quadlink::ConnectionStatus status = quadlink::UAV::connection.connect_udp(connection_url);
+    quadlink::ConnectionStatus status = quadlink::UAV::connection->connect_udp(connection_url);
     
     switch (status)
     {
@@ -70,7 +70,7 @@ FlightStatus UAV::arm()
     arm_command.param1 = 1.0f;  // 1.0 for arm / 0.0 for disarm
     arm_command.param2 = 0.0f; 
 
-    quadlink::ConnectionStatus status = connection.send_mav_message(arm_command);
+    quadlink::ConnectionStatus status = connection->send_mav_message(arm_command);
     switch (status)
     {
         case (quadlink::ConnectionStatus::Success):

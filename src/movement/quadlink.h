@@ -56,7 +56,8 @@ namespace quadlink {
         void get_battery_status();
 
     private:
-        quadlink::QuadConnector connection;
+        std::shared_ptr<quadlink::QuadConnector> connection;
+        // quadlink::QuadTelemetry q_telemetry;
         Vehicle vehicle_type;
         std::string vehicle_name;
         std::string connection_url;
