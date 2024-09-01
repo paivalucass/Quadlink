@@ -10,16 +10,14 @@
 #include <chrono>
 #include <cstring>
 #include "../connection/quad_connection.h"
-
+#include "../movement/format.h"
 
 namespace quadlink{
     /**
      * @brief Enum class for different sensor statuses.
      */
     enum class SensorStatus{
-        Present,
         Absent,
-        Enabled,
         Disabled,
         Healthy,
         Unhealthy
@@ -52,10 +50,10 @@ namespace quadlink{
 
             /**
              * @brief Checks the health of the main sensors.
-             * This method checks via bitmap the health of GYRO, ACCELEROMETER, MAGNETOMETER, GPS.
+             * This method checks via bitmap the health of GYRO, ACCELEROMETER, MAGNETOMETER, GPS from a quadcopter.
              * @return The quadlink::Sensors status of the sensors.
              */
-            quadlink::Sensors check_sensors_health();
+            quadlink::SensorStatus check_sensors_status();
 
             /**
              * @brief Performs a bitmask operation AND to verify sensor status.
@@ -66,6 +64,8 @@ namespace quadlink{
             quadlink::SensorStatus sensor_health(mavlink_sys_status_t sys, uint8_t sensor);
 
         private:
+            std::string parse_sensor_status(SensorStatus status);
+            quadlink::Sensors sensors;
             std::shared_ptr<quadlink::MessageFactory> msg_factory;
     };
 }

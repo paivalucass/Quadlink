@@ -18,12 +18,18 @@
 namespace quadlink{
     class MessageFactory
     {
-        MessageFactory();
+        public:
+            MessageFactory();
 
-        ~MessageFactory() = default;
+            ~MessageFactory() = default;
 
-        mavlink_command_long_t create_arm();
+            mavlink_command_long_t create_arm_command();
 
-        mavlink_command_long_t create_takeoff();
+            mavlink_command_long_t create_mode_command(uint8_t mode);
+
+            mavlink_command_long_t create_takeoff_command();
+
+        private:
+
     };
 }
