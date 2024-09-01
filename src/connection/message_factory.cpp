@@ -1,6 +1,8 @@
 #include "message_factory.h"
 
 
+
+namespace quadlink{
 quadlink::MessageFactory::MessageFactory(){
 
 }
@@ -18,7 +20,7 @@ mavlink_command_long_t quadlink::MessageFactory::create_arm_command(){
     return command;
 }
 
-mavlink_command_long_t quadlink::MessageFactory::create_mode_command(uint8_t mode){
+mavlink_command_long_t quadlink::MessageFactory::create_mode_command(uint16_t mode){
 
     mavlink_command_long_t command = {0}; 
 
@@ -26,4 +28,17 @@ mavlink_command_long_t quadlink::MessageFactory::create_mode_command(uint8_t mod
     command.param1 = mode; 
 
     return command;    
+}
+
+mavlink_command_long_t quadlink::MessageFactory::create_set_home_command(){
+
+    mavlink_command_long_t command = {0}; 
+
+    command.command = MAV_CMD_DO_SET_HOME;
+    command.param1 = 0; 
+    command.param2 = 0; 
+    command.param3 = 0; 
+
+    return command;
+}
 }

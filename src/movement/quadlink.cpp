@@ -53,7 +53,15 @@ FlightStatus UAV::arm()
         return quadlink::FlightStatus::FAILED;
     } 
 
-    quadlink::QuadAction::action_change_mode(MAV_MODE_GUIDED_ARMED);
+    // quadlink::ConnectionStatus status;
+
+    if (quadlink::QuadAction::action_set_home_position() == quadlink::ConnectionStatus::Failed){
+        std::cout << "aa" <<std::endl;
+    }
+
+    if (quadlink::QuadAction::action_change_mode(MAV_MODE_GUIDED_ARMED) == quadlink::ConnectionStatus::Failed){
+        std::cout << "aaaasa" <<std::endl;
+    }
 
     switch (quadlink::QuadAction::action_arm())
     {

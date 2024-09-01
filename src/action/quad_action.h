@@ -23,7 +23,7 @@ namespace quadlink{
 
             quadlink::ConnectionStatus action_change_mode(uint8_t mode);
 
-            
+            quadlink::ConnectionStatus action_set_home_position();
 
         private:
             std::shared_ptr<quadlink::MessageFactory> msg_factory;
