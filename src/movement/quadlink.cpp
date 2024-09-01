@@ -46,24 +46,22 @@ FlightStatus UAV::connect(std::string& connection_url)
 
 FlightStatus UAV::arm()
 {
-    // TODO: A message factory to abstract message creation
-    // TODO: Verify vehicle integrity before arming via telemetry
     std::cout << YELLOW_BOLD_TEXT << "[INFO] ARMING " << UAV::vehicle_name << RESET_TEXT << std::endl;
-    mavlink_command_long_t arm_command;
-    
-    arm_command.command = MAV_CMD_COMPONENT_ARM_DISARM;
-    arm_command.confirmation = 0;
-    arm_command.param1 = 1.0f;  // 1.0 for arm / 0.0 for disarm
-    arm_command.param2 = 0.0f; 
 
-    quadlink::ConnectionStatus status = this->send_mav_message(arm_command);
-    switch (status)
+    if (quadlink::QuadTelemetry::check_sensors_status() != quadlink::SensorStatus::Healthy)
+    {
+        return quadlink::FlightStatus::FAILED;
+    } 
+
+    quadlink::QuadAction::action_change_mode(MAV_MODE_GUIDED_ARMED);
+
+    switch (quadlink::QuadAction::action_arm())
     {
         case (quadlink::ConnectionStatus::Success):
             std::cout << GREEN_BOLD_TEXT << "[INFO] SUCCESS ARMING " << UAV::vehicle_name << RESET_TEXT << std::endl;
             return quadlink::FlightStatus::FINISHED;
         case (quadlink::ConnectionStatus::Failed):
-            std::cout << RED_BOLD_TEXT << "[INFO] " << UAV::vehicle_name << " ARMED" << RESET_TEXT << std::endl;
+            std::cout << RED_BOLD_TEXT << "[INFO] " << UAV::vehicle_name << " FAILED ARMING" << RESET_TEXT << std::endl;
             return quadlink::FlightStatus::FAILED;
         case (quadlink::ConnectionStatus::Timeout):
             std::cout << RED_BOLD_TEXT << "[INFO] ARMING TIMED OUT " << RESET_TEXT << std::endl;
