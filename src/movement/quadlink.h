@@ -22,10 +22,16 @@
 
 namespace quadlink {
 
+    /**
+     * @brief Enum class for different types of vehicles.
+     */
     enum class Vehicle {
         QuadCopter
     };
 
+    /**
+     * @brief Enum class for different flight statuses.
+     */
     enum class FlightStatus {
         IN_PROGRESS,
         FAILED,
@@ -33,38 +39,64 @@ namespace quadlink {
         TIMEOUT
     };
 
-    /*
-        This class should be adaptable to all vehicles.
-    */
+    /**
+     * @brief A class representing a UAV, adaptable to all vehicles.
+     */
     class UAV : public QuadTelemetry, public QuadAction{
     public:
-        // Constructor of the UAV class
+        /**
+         * @brief Constructor of class UAV.
+         * @param vehicle_type type of the UAV being used quadlink::Vehicle e.g Quadcopter.
+         */
         UAV(Vehicle vehicle_type);
 
-        // Destructor (currently default but should be created futher on when dynamic allocation is used!)
+        /**
+         * @brief Destructor of class UAV.
+         */
         ~UAV() = default;
 
-        // Connect the drone via UDP, TCP, Serial
+        /**
+         * @brief Connect to the drone via UDP, TCP or serial.
+         * @param connection_url The URL for the connection e.g 127.0.0.1:14568.
+         * @return The quadlink::FlightStatus representing the connection. 
+         */
         FlightStatus connect(std::string& connection_url);
 
-        // Do pre flight check and perform arm
+        /**
+         * @brief Perform pre-flight check and arm the drone.
+         * @return The quadlink::FlightStatus representing the arming.
+         */
         FlightStatus arm();
 
-        // Perform takeoff
+        /**
+         * @brief Perform takeoff to a target height.
+         * @param target_height The target height for the takeoff.
+         * @return The quadlink::FlightStatus representing the takeoff.
+         */
         FlightStatus takeoff(double target_height);
 
-        // Perform land
+        /**
+         * @brief Perform landing.
+         * @param check A boolean to check if landing is possible.
+         * @return The quadlink::FlightStatus representing the landing.
+         */
         FlightStatus land(bool check);
 
-        // Go to a pre defined position
+        /**
+         * @brief Go to a pre-defined position.
+         * @param x The x-coordinate of the position.
+         * @param y The y-coordinate of the position.
+         * @param z The z-coordinate of the position.
+         * @return The quadlink::FlightStatus representing the go to.
+         */
         FlightStatus go_to_relative(double x, double y, double z);
 
-        // Obtain battery level
+        /**
+         * @brief Obtain the battery status of the drone.
+         */
         void get_battery_status();
 
     private:
-        // std::shared_ptr<quadlink::QuadConnector> connection;
-        // quadlink::QuadTelemetry q_telemetry;
         Vehicle vehicle_type;
         std::string vehicle_name;
         std::string connection_url;
@@ -72,4 +104,3 @@ namespace quadlink {
         std::shared_ptr<mavsdk::Telemetry> telemetry;
     };
 }
-
