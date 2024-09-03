@@ -19,6 +19,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <cmath>
+#include "../connection/message_factory.h"
 
 namespace quadlink {
 
@@ -63,10 +64,10 @@ namespace quadlink {
         FlightStatus connect(std::string& connection_url);
 
         /**
-         * @brief Perform pre-flight check and arm the drone.
+         * @brief Perform pre-flight check and arm the drone in the determined flight mode.
          * @return The quadlink::FlightStatus representing the arming.
          */
-        FlightStatus arm();
+        FlightStatus arm(ArdupilotFlightMode flight_mode);
 
         /**
          * @brief Perform takeoff to a target height.

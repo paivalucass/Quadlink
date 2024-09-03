@@ -46,7 +46,7 @@ quadlink::SensorStatus quadlink::QuadTelemetry::check_sensors_status(){
     */
     // TODO: BEING ABLE TO PICK WHICH SENSORS ARE USED FOR CHECK. 
     std::string status_name;
-    quadlink::MessageStatus status = this->wait_message(MAVLINK_MSG_ID_SYS_STATUS, 5);
+    quadlink::MessageStatus status = quadlink::QuadConnector::wait_message(MAVLINK_MSG_ID_SYS_STATUS, 5);
     quadlink::QuadTelemetry::sensors.gyro = quadlink::QuadTelemetry::sensor_health(status.sys, MAV_SYS_STATUS_SENSOR_3D_GYRO);
     quadlink::QuadTelemetry::sensors.accel = quadlink::QuadTelemetry::sensor_health(status.sys, MAV_SYS_STATUS_SENSOR_3D_ACCEL);
     quadlink::QuadTelemetry::sensors.mag = quadlink::QuadTelemetry::sensor_health(status.sys, MAV_SYS_STATUS_SENSOR_3D_MAG);
