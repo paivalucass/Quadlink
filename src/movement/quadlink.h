@@ -31,16 +31,6 @@ namespace quadlink {
     };
 
     /**
-     * @brief Enum class for different flight statuses.
-     */
-    enum class FlightStatus {
-        IN_PROGRESS,
-        FAILED,
-        FINISHED,
-        TIMEOUT
-    };
-
-    /**
      * @brief A class representing a UAV, adaptable to all vehicles.
      */
     class UAV : public QuadTelemetry, public QuadAction{
@@ -59,38 +49,38 @@ namespace quadlink {
         /**
          * @brief Connect to the drone via UDP, TCP or serial.
          * @param connection_url The URL for the connection e.g 127.0.0.1:14568.
-         * @return The quadlink::FlightStatus representing the connection. 
+         * @return The quadlink::ConnectionStatus representing the connection. 
          */
-        FlightStatus connect(std::string& connection_url);
+        ConnectionStatus connect(std::string& connection_url);
 
         /**
          * @brief Perform pre-flight check and arm the drone in the determined flight mode.
-         * @return The quadlink::FlightStatus representing the arming.
+         * @return The quadlink::ConnectionStatus representing the arming.
          */
-        FlightStatus arm(ArdupilotFlightMode flight_mode);
+        ConnectionStatus arm(ArdupilotFlightMode flight_mode);
 
         /**
          * @brief Perform takeoff to a target height.
          * @param target_height The target height for the takeoff.
-         * @return The quadlink::FlightStatus representing the takeoff.
+         * @return The quadlink::ConnectionStatus representing the takeoff.
          */
-        FlightStatus takeoff(double target_height);
+        ConnectionStatus takeoff(float target_height, bool blocking);
 
         /**
          * @brief Perform landing.
          * @param check A boolean to check if landing is possible.
-         * @return The quadlink::FlightStatus representing the landing.
+         * @return The quadlink::ConnectionStatus representing the landing.
          */
-        FlightStatus land(bool check);
+        ConnectionStatus land(bool check);
 
         /**
          * @brief Go to a pre-defined position.
          * @param x The x-coordinate of the position.
          * @param y The y-coordinate of the position.
          * @param z The z-coordinate of the position.
-         * @return The quadlink::FlightStatus representing the go to.
+         * @return The quadlink::ConnectionStatus representing the go to.
          */
-        FlightStatus go_to_relative(double x, double y, double z);
+        ConnectionStatus go_to_relative(double x, double y, double z);
 
         /**
          * @brief Obtain the battery status of the drone.

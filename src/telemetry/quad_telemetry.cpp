@@ -74,5 +74,17 @@ quadlink::SensorStatus quadlink::QuadTelemetry::check_sensors_status(){
     }
 
     return quadlink::SensorStatus::Healthy;
-}               
+}
+
+
+quadlink::VehicleStatus quadlink::QuadTelemetry::check_is_armed(){
+    quadlink::MessageStatus status = quadlink::QuadConnector::wait_message(MAVLINK_MSG_ID_HEARTBEAT, 5);
+    /*
+        AND operation to verify the armed flag
+    */
+    if (status.heartbeat.base_mode & MAV_MODE_FLAG_SAFETY_ARMED){
+        return quadlink::VehicleStatus::Armed;
+    }
+    return quadlink::VehicleStatus::Disarmed;
+}
 }
