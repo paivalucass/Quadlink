@@ -21,7 +21,7 @@ namespace quadlink{
 
             quadlink::ConnectionStatus action_arm();
 
-            quadlink::ConnectionStatus action_change_mode(uint8_t mode);
+            quadlink::ConnectionStatus action_change_mode(ArdupilotFlightMode flight_mode);
 
             quadlink::ConnectionStatus action_set_home_position();
 
