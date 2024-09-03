@@ -14,9 +14,9 @@ quadlink::ConnectionStatus quadlink::QuadAction::action_arm(){
     return quadlink::QuadConnector::send_mav_message(arm_command);
 }
 
-quadlink::ConnectionStatus quadlink::QuadAction::action_change_mode(uint8_t mode){
+quadlink::ConnectionStatus quadlink::QuadAction::action_change_mode(ArdupilotFlightMode flight_mode){
 
-    mavlink_command_long_t mode_command = msg_factory->create_mode_command(mode);
+    mavlink_command_long_t mode_command = msg_factory->create_mode_command(flight_mode);
 
     return quadlink::QuadConnector::send_mav_message(mode_command);
 }

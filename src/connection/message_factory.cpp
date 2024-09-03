@@ -20,12 +20,16 @@ mavlink_command_long_t quadlink::MessageFactory::create_arm_command(){
     return command;
 }
 
-mavlink_command_long_t quadlink::MessageFactory::create_mode_command(uint16_t mode){
+mavlink_command_long_t quadlink::MessageFactory::create_mode_command(ArdupilotFlightMode flight_mode){
+
+    float mode = static_cast<float>(flight_mode);
 
     mavlink_command_long_t command = {0}; 
 
     command.command = MAV_CMD_DO_SET_MODE;  
-    command.param1 = mode; 
+    command.param1 = MAV_MODE_FLAG_CUSTOM_MODE_ENABLED;
+    command.param2 = mode;
+    command.param3 = 0; 
 
     return command;    
 }
@@ -35,9 +39,7 @@ mavlink_command_long_t quadlink::MessageFactory::create_set_home_command(){
     mavlink_command_long_t command = {0}; 
 
     command.command = MAV_CMD_DO_SET_HOME;
-    command.param1 = 0; 
-    command.param2 = 0; 
-    command.param3 = 0; 
+    command.param1 = 1;  // 1 para usar a posição atual do sistema, 0 para definir manualmente
 
     return command;
 }

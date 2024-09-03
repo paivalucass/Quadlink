@@ -16,6 +16,17 @@
 #include <cstring>
 
 namespace quadlink{
+
+    /*
+        Currently only supporting Ardupilot modes. PX4 should be added in the near future
+    */
+    enum class ArdupilotFlightMode{
+        STABILIZE = 0,
+        GUIDED = 4,
+        LOITER = 5,
+        LAND = 9
+    };
+
     class MessageFactory
     {
         public:
@@ -25,7 +36,7 @@ namespace quadlink{
 
             mavlink_command_long_t create_arm_command();
 
-            mavlink_command_long_t create_mode_command(uint16_t mode);
+            mavlink_command_long_t create_mode_command(ArdupilotFlightMode mode);
 
             mavlink_command_long_t create_takeoff_command();
 
