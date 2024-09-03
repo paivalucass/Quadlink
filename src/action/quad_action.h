@@ -25,7 +25,12 @@ namespace quadlink{
 
             quadlink::ConnectionStatus action_set_home_position();
 
+            quadlink::ConnectionStatus action_takeoff();
+
+            void action_set_takeoff_height(float height);
+
         private:
             std::shared_ptr<quadlink::MessageFactory> msg_factory;
+            float _takeoff_height;
     };
 }

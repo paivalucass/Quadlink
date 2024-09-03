@@ -1,7 +1,5 @@
 #include "message_factory.h"
 
-
-
 namespace quadlink{
 quadlink::MessageFactory::MessageFactory(){
 
@@ -43,4 +41,15 @@ mavlink_command_long_t quadlink::MessageFactory::create_set_home_command(){
 
     return command;
 }
+
+mavlink_command_long_t quadlink::MessageFactory::create_takeoff_command(float height){
+
+    mavlink_command_long_t command = {0};
+
+    command.command = MAV_CMD_NAV_TAKEOFF;
+    command.param7 = height;
+
+    return command;
+}
+
 }

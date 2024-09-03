@@ -27,5 +27,18 @@ quadlink::ConnectionStatus quadlink::QuadAction::action_set_home_position(){
 
     return quadlink::QuadConnector::send_mav_message(home_command);
 }
+
+quadlink::ConnectionStatus quadlink::QuadAction::action_takeoff(){
+    
+    mavlink_command_long_t takeoff_command = msg_factory->create_takeoff_command(quadlink::QuadAction::_takeoff_height);
+
+    return quadlink::QuadConnector::send_mav_message(takeoff_command);
+}
+
+
+void quadlink::QuadAction::action_set_takeoff_height(float height){
+
+    quadlink::QuadAction::_takeoff_height = height;
+}
 }
 
