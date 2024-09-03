@@ -23,6 +23,7 @@ quadlink::MessageStatus quadlink::QuadConnector::check_message(uint16_t target_I
             if (msg.msgid == target_ID) {
                 // TODO: Switch Case here?
                 if (target_ID == MAVLINK_MSG_ID_HEARTBEAT){
+                    mavlink_msg_heartbeat_decode(&msg, &return_status.heartbeat);
                     // CURRENTLY HARD CODED BUT CAN BE THE CAUSE OF FUTURE PROBLEMS WITH CONNECTION, THIS SHOULD BE CHANGED ASAP TO A MORE DYNAMIC APPROACH
                     quadlink::QuadConnector::target_system_id = msg.sysid;
                     quadlink::QuadConnector::system_id = 1; // Considering both system id and component id from sneder are always 1 (should be working for now)
