@@ -1,12 +1,4 @@
-#include <string>
-#include <memory>
-#include "../quad_connection.h"
-#include <mavlink/common/mavlink.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <cmath>
-#include <iostream>
+#include "mav_messages.h"
 
 // quadlink::ConnectionStatus check_message(const uint8_t* buffer, ssize_t size, uint8_t target_ID)
 // {

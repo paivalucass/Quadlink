@@ -3,60 +3,91 @@
 
 #include <string>
 #include <memory>
+#include "quadlink.h"
+#include "../connection/quad_connection.h"
+#include "../telemetry/quad_telemetry.h"
+#include "../action/quad_action.h"
+#include "format.h"
+#include <iostream>
 #include <mavsdk/mavsdk.h>
 #include <mavlink/common/mavlink.h>
 #include <mavsdk/plugins/action/action.h>
 #include <mavsdk/plugins/telemetry/telemetry.h>
-#include "../connection/quad_connection.h"
+#include <thread>
+#include <chrono>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <cmath>
+#include "../connection/message_factory.h"
 
 namespace quadlink {
 
+    /**
+     * @brief Enum class for different types of vehicles.
+     */
     enum class Vehicle {
         QuadCopter
     };
 
-    enum class FlightStatus {
-        IN_PROGRESS,
-        FAILED,
-        FINISHED,
-        TIMEOUT
-    };
-
-    /*
-        This class should be adaptable to all vehicles.
-    */
-    class UAV {
+    /**
+     * @brief A class representing a UAV, adaptable to all vehicles.
+     */
+    class UAV : public QuadTelemetry, public QuadAction{
     public:
-        // Constructor of the UAV class
+        /**
+         * @brief Constructor of class UAV.
+         * @param vehicle_type type of the UAV being used quadlink::Vehicle e.g Quadcopter.
+         */
         UAV(Vehicle vehicle_type);
 
-        // Destructor (currently default but should be created futher on when dynamic allocation is used!)
+        /**
+         * @brief Destructor of class UAV.
+         */
         ~UAV() = default;
 
-        // Connect the drone via UDP, TCP, Serial
-        FlightStatus connect(std::string& connection_url);
+        /**
+         * @brief Connect to the drone via UDP, TCP or serial.
+         * @param connection_url The URL for the connection e.g 127.0.0.1:14568.
+         * @return The quadlink::ConnectionStatus representing the connection. 
+         */
+        ConnectionStatus connect(std::string& connection_url);
 
-        // Do pre flight check and perform arm
-        FlightStatus arm();
+        /**
+         * @brief Perform pre-flight check and arm the drone in the determined flight mode.
+         * @return The quadlink::ConnectionStatus representing the arming.
+         */
+        ConnectionStatus arm(ArdupilotFlightMode flight_mode);
 
-        // Perform takeoff
-        FlightStatus takeoff(double target_height);
+        /**
+         * @brief Perform takeoff to a target height.
+         * @param target_height The target height for the takeoff.
+         * @return The quadlink::ConnectionStatus representing the takeoff.
+         */
+        ConnectionStatus takeoff(float target_height, bool blocking);
 
-        // Perform land
-        FlightStatus land(bool check);
+        /**
+         * @brief Perform landing.
+         * @param check A boolean to check if landing is possible.
+         * @return The quadlink::ConnectionStatus representing the landing.
+         */
+        ConnectionStatus land(bool check);
 
-        // Go to a pre defined position
-        FlightStatus go_to_relative(double x, double y, double z);
+        /**
+         * @brief Go to a pre-defined position.
+         * @param x The x-coordinate of the position.
+         * @param y The y-coordinate of the position.
+         * @param z The z-coordinate of the position.
+         * @return The quadlink::ConnectionStatus representing the go to.
+         */
+        ConnectionStatus go_to_relative(double x, double y, double z);
 
-        // Obtain battery level
+        /**
+         * @brief Obtain the battery status of the drone.
+         */
         void get_battery_status();
 
     private:
-        quadlink::QuadConnector connection;
         Vehicle vehicle_type;
         std::string vehicle_name;
         std::string connection_url;
@@ -64,4 +95,3 @@ namespace quadlink {
         std::shared_ptr<mavsdk::Telemetry> telemetry;
     };
 }
-

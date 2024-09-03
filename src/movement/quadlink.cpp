@@ -1,21 +1,8 @@
 #include "quadlink.h"
-#include "../connection/quad_connection.h"
-#include "format.h"
-#include <iostream>
-#include <mavsdk/mavsdk.h>
-#include <mavlink/common/mavlink.h>
-#include <mavsdk/plugins/action/action.h>
-#include <mavsdk/plugins/telemetry/telemetry.h>
-#include <thread>
-#include <chrono>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <cmath>
 
 namespace quadlink{
 
-UAV::UAV(Vehicle vehicle_type) : vehicle_type(vehicle_type), connection()  {
+UAV::UAV(Vehicle vehicle_type) : vehicle_type(vehicle_type)  {
     
     switch (vehicle_type)
     {
@@ -27,10 +14,9 @@ UAV::UAV(Vehicle vehicle_type) : vehicle_type(vehicle_type), connection()  {
     default:
         break;
     }
-
 }
 
-FlightStatus UAV::connect(std::string& connection_url)
+quadlink::ConnectionStatus UAV::connect(std::string& connection_url)
 {
     /*
         Connection URL only tested with UDP for now 
@@ -40,117 +26,141 @@ FlightStatus UAV::connect(std::string& connection_url)
     //Connect via string
     std::cout << YELLOW_BOLD_TEXT << "[INFO] CONNECTING TO " << UAV::vehicle_name << RESET_TEXT << std::endl;
 
-    quadlink::ConnectionStatus status = quadlink::UAV::connection.connect_udp(connection_url);
+    quadlink::ConnectionStatus status = quadlink::QuadConnector::connect_udp(connection_url);
     
     switch (status)
     {
-        case (quadlink::ConnectionStatus::Success):
+        case (quadlink::ConnectionStatus::Finished):
             std::cout << GREEN_BOLD_TEXT << "[INFO] " << UAV::vehicle_name << " CONNECTED SUCCESSFULLY" << RESET_TEXT << std::endl;
-            return quadlink::FlightStatus::FINISHED;
+            return quadlink::ConnectionStatus::Finished;
         case (quadlink::ConnectionStatus::Failed):
-            std::cerr << "[INFO] " << UAV::vehicle_name << " FAILED CONNECTING" << RESET_TEXT << std::endl;
-            return quadlink::FlightStatus::FAILED;
+            std::cerr << "[ERROR] " << UAV::vehicle_name << " FAILED CONNECTING" << RESET_TEXT << std::endl;
+            return quadlink::ConnectionStatus::Failed;
         case (quadlink::ConnectionStatus::Timeout):
-            std::cout << RED_BOLD_TEXT << "[INFO] " << UAV::vehicle_name << " CONNECTION TIMEOUT" << RESET_TEXT << std::endl;
-            return quadlink::FlightStatus::TIMEOUT;
+            std::cerr << RED_BOLD_TEXT << "[TIMEOUT] " << UAV::vehicle_name << " CONNECTION TIMEOUT" << RESET_TEXT << std::endl;
+            return quadlink::ConnectionStatus::Timeout;
         default:
-            return quadlink::FlightStatus::FAILED;
+            return quadlink::ConnectionStatus::Failed;
     }
 }
 
-FlightStatus UAV::arm()
+quadlink::ConnectionStatus UAV::arm(ArdupilotFlightMode flight_mode)
 {
-    // TODO: A message factory to abstract message creation
-    // TODO: Verify vehicle integrity before arming via telemetry
     std::cout << YELLOW_BOLD_TEXT << "[INFO] ARMING " << UAV::vehicle_name << RESET_TEXT << std::endl;
-    mavlink_command_long_t arm_command;
-    
-    arm_command.command = MAV_CMD_COMPONENT_ARM_DISARM;
-    arm_command.confirmation = 0;
-    arm_command.param1 = 1.0f;  // 1.0 for arm / 0.0 for disarm
-    arm_command.param2 = 0.0f; 
 
-    quadlink::ConnectionStatus status = connection.send_mav_message(arm_command);
-    switch (status)
+    /*
+        Is vehicle armed?
+    */
+    if (quadlink::QuadTelemetry::check_is_armed() == quadlink::VehicleStatus::Armed)
     {
-        case (quadlink::ConnectionStatus::Success):
+        return quadlink::ConnectionStatus::Finished;
+    }
+
+    /*
+        Perform pre-flight check.
+    */
+    if (quadlink::QuadTelemetry::check_sensors_status() != quadlink::SensorStatus::Healthy)
+    {
+        return quadlink::ConnectionStatus::Failed;
+    } 
+
+    if (quadlink::QuadAction::action_set_home_position() == quadlink::ConnectionStatus::Failed){
+        std::cerr << YELLOW_BOLD_TEXT << "[ERROR] WARNING! " << UAV::vehicle_name << " FAILED SETTING HOME POSITION" << RESET_TEXT << std::endl;
+    }
+
+    if (quadlink::QuadAction::action_change_mode(flight_mode) == quadlink::ConnectionStatus::Failed){
+        std::cerr << RED_BOLD_TEXT << "[ERROR] FAILED CHANGING " << UAV::vehicle_name << " FLIGHT MODE, UNSAFE TO ARM" << RESET_TEXT << std::endl;
+        return quadlink::ConnectionStatus::Failed;
+    }
+
+    /*
+        Arm UAV.
+    */
+    switch (quadlink::QuadAction::action_arm())
+    {
+        case (quadlink::ConnectionStatus::Finished):
             std::cout << GREEN_BOLD_TEXT << "[INFO] SUCCESS ARMING " << UAV::vehicle_name << RESET_TEXT << std::endl;
-            return quadlink::FlightStatus::FINISHED;
+            return quadlink::ConnectionStatus::Finished;
         case (quadlink::ConnectionStatus::Failed):
-            std::cout << RED_BOLD_TEXT << "[INFO] " << UAV::vehicle_name << " ARMED" << RESET_TEXT << std::endl;
-            return quadlink::FlightStatus::FAILED;
+            std::cerr << RED_BOLD_TEXT << "[ERROR] " << UAV::vehicle_name << " FAILED ARMING" << RESET_TEXT << std::endl;
+            return quadlink::ConnectionStatus::Failed;
         case (quadlink::ConnectionStatus::Timeout):
-            std::cout << RED_BOLD_TEXT << "[INFO] ARMING TIMED OUT " << RESET_TEXT << std::endl;
-            return quadlink::FlightStatus::TIMEOUT;
+            std::cerr << RED_BOLD_TEXT << "[TIMEOUT] ARMING TIMED OUT " << RESET_TEXT << std::endl;
+            return quadlink::ConnectionStatus::Timeout;
         default:
-            return quadlink::FlightStatus::FAILED;
+            return quadlink::ConnectionStatus::Failed;
     }
 }
 
-FlightStatus UAV::takeoff(double target_height)
+quadlink::ConnectionStatus UAV::takeoff(float target_height, bool blocking)
 {
     /*
         Perform takeoff given a determined height
     */
 
-    // Setting takeoff altitude 
-    UAV::action->set_takeoff_altitude(target_height);
+    std::cout << YELLOW_BOLD_TEXT << "[INFO] ATTEMPTING TAKEOFF" << RESET_TEXT << std::endl;
 
-    if (UAV::arm() == FlightStatus::FINISHED)
+    // Setting takeoff altitude 
+    quadlink::QuadAction::action_set_takeoff_height(target_height);
+
+    if (quadlink::QuadTelemetry::check_is_armed() == quadlink::VehicleStatus::Armed)
     {
         std::cout << YELLOW_BOLD_TEXT << "[INFO] TAKING OFF..." << RESET_TEXT << std::endl;
-        const mavsdk::Action::Result flying = UAV::action->takeoff();
+        
+        quadlink::ConnectionStatus takeoff_status = quadlink::QuadAction::action_takeoff();
 
-        if (flying != mavsdk::Action::Result::Success)
-        {
-            std::cerr << "Takeoff Failed" << flying << std::endl;
-            return FlightStatus::FAILED;
-        }
-        else
-        {
-            /*
-                This guarantees that the takeoff will be finished before leaving the method
-            */
-            while (UAV::telemetry->position().relative_altitude_m < target_height)
-            {
-                std::this_thread::sleep_for(std::chrono::seconds(1));
-            }
-            std::cout << GREEN_BOLD_TEXT << "[INFO]" << UAV::vehicle_name << " finished climbing" << RESET_TEXT << std::endl;
-            return FlightStatus::FINISHED;
+        switch (takeoff_status){
+            case (quadlink::ConnectionStatus::Finished):
+                if (blocking){
+                    /*
+                        TODO: Method only stops after reaching the altitude 
+                    */
+                }
+                else{
+                    std::cout << GREEN_BOLD_TEXT << "[INFO] TAKEOFF SUCCESSFULL" << RESET_TEXT << std::endl;
+                    return quadlink::ConnectionStatus::Finished;
+                }
+            case (quadlink::ConnectionStatus::Failed):
+                std::cerr << RED_BOLD_TEXT << "[INFO] TAKEOFF FAILED" << RESET_TEXT << std::endl;
+                return quadlink::ConnectionStatus::Failed;
+            case (quadlink::ConnectionStatus::Timeout):
+                std::cerr << RED_BOLD_TEXT << "[TIMEOUT] TAKEOFF TIMED OUT" << RESET_TEXT << std::endl;    
+                return quadlink::ConnectionStatus::Timeout;
         }
     }
     else
     {
-        return FlightStatus::FAILED;
+        std::cout << RED_BOLD_TEXT << "[ERROR] " << quadlink::UAV::vehicle_name << " NOT ARMED" << RESET_TEXT << std::endl;
+        return quadlink::ConnectionStatus::Failed;
     }
 }
 
-FlightStatus UAV::land(bool check)
+quadlink::ConnectionStatus UAV::land(bool check)
 {
-    if (check)
-    {
-        if (UAV::telemetry->armed())
-        {
-            return FlightStatus::IN_PROGRESS;
-        }
-        else
-        {
-            std::cout << GREEN_BOLD_TEXT << "[INFO]" << UAV::vehicle_name << " landed successfully" << RESET_TEXT << std::endl;
-            return FlightStatus::FINISHED;
-        }
-    }
+    // if (check)
+    // {
+    //     if (UAV::telemetry->armed())
+    //     {
+    //         return quadlink::ConnectionStatus::IN_PROGRESS;
+    //     }
+    //     else
+    //     {
+    //         std::cout << GREEN_BOLD_TEXT << "[INFO]" << UAV::vehicle_name << " landed successfully" << RESET_TEXT << std::endl;
+    //         return quadlink::ConnectionStatus::FINISHED;
+    //     }
+    // }
 
-    std::cout << YELLOW_BOLD_TEXT << "[INFO] Landing..." << RESET_TEXT << std::endl;
-    const mavsdk::Action::Result landing = UAV::action->land();
+    // std::cout << YELLOW_BOLD_TEXT << "[INFO] Landing..." << RESET_TEXT << std::endl;
+    // const mavsdk::Action::Result landing = UAV::action->land();
 
-    if (landing == mavsdk::Action::Result::Success)
-    {
-        return FlightStatus::IN_PROGRESS;
-    }
-    else
-    {
-        std::cerr << "Landing failed" << std::endl;
-        return FlightStatus::FAILED;
-    }
+    // if (landing == mavsdk::Action::Result::Success)
+    // {
+    //     return quadlink::ConnectionStatus::IN_PROGRESS;
+    // }
+    // else
+    // {
+    //     std::cerr << "Landing failed" << std::endl;
+    //     return quadlink::ConnectionStatus::FAILED;
+    // }
 }
 }
