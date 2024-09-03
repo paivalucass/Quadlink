@@ -36,7 +36,7 @@ quadlink::MessageStatus quadlink::QuadConnector::check_message(uint16_t target_I
                 else if (target_ID == MAVLINK_MSG_ID_SYS_STATUS){
                     mavlink_msg_sys_status_decode(&msg, &return_status.sys);
                 }
-                return_status.connection = quadlink::ConnectionStatus::Success;
+                return_status.connection = quadlink::ConnectionStatus::Finished;
                 return return_status;
             }
         }
@@ -87,7 +87,7 @@ quadlink::ConnectionStatus quadlink::QuadConnector::create_socket(std::string& c
         return quadlink::ConnectionStatus::Failed;
     }
 
-    return quadlink::ConnectionStatus::Success;
+    return quadlink::ConnectionStatus::Finished;
 }
 
 quadlink::MessageStatus quadlink::QuadConnector::wait_message(uint16_t target_ID, double time_waiting)
@@ -105,7 +105,7 @@ quadlink::MessageStatus quadlink::QuadConnector::wait_message(uint16_t target_ID
     //  Reset clock choronometer
     quadlink::QuadConnector::clock.reset();
 
-    while (quadlink::QuadConnector::clock.watch() < time_waiting && status.connection != quadlink::ConnectionStatus::Success)
+    while (quadlink::QuadConnector::clock.watch() < time_waiting && status.connection != quadlink::ConnectionStatus::Finished)
     {
         std::fill(quadlink::QuadConnector::buffer, quadlink::QuadConnector::buffer + quadlink::QuadConnector::buffer_size, 0);
         /*
@@ -121,7 +121,7 @@ quadlink::MessageStatus quadlink::QuadConnector::wait_message(uint16_t target_ID
         }
     }
     
-    if (status.connection == quadlink::ConnectionStatus::Success)
+    if (status.connection == quadlink::ConnectionStatus::Finished)
     {
         return status;
     }
@@ -145,9 +145,9 @@ quadlink::ConnectionStatus quadlink::QuadConnector::connect_udp(std::string& con
 
     quadlink::MessageStatus message_status = wait_message(MAVLINK_MSG_ID_HEARTBEAT, 5.0);
 
-    if (message_status.connection == quadlink::ConnectionStatus::Success)
+    if (message_status.connection == quadlink::ConnectionStatus::Finished)
     {
-        return quadlink::ConnectionStatus::Success;
+        return quadlink::ConnectionStatus::Finished;
     }
     else if (message_status.connection == quadlink::ConnectionStatus::Timeout)
     {
@@ -174,9 +174,9 @@ quadlink::ConnectionStatus quadlink::QuadConnector::send_mav_message(mavlink_com
 
         ack_status = wait_message(MAVLINK_MSG_ID_COMMAND_ACK, 2.0);
         
-        if (ack_status.connection == quadlink::ConnectionStatus::Success && ack_status.ack.result == MAV_RESULT_ACCEPTED)
+        if (ack_status.connection == quadlink::ConnectionStatus::Finished && ack_status.ack.result == MAV_RESULT_ACCEPTED)
         {   
-            return quadlink::ConnectionStatus::Success;
+            return quadlink::ConnectionStatus::Finished;
         }
         else if (ack_status.connection == quadlink::ConnectionStatus::Timeout)
         {

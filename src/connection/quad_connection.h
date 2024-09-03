@@ -21,10 +21,12 @@ namespace quadlink {
     /**
      * @brief Enum class for connection statuses.
      */
+    // this should replace FlightStatus
     enum class ConnectionStatus{
-        Success,
+        Finished,
         Failed,
-        Timeout
+        Timeout,
+        In_progress
     };
 
     /**

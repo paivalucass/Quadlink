@@ -13,9 +13,16 @@
 #include "../movement/format.h"
 
 namespace quadlink{
+    enum class VehicleStatus{
+        Armed,
+        Disarmed,
+        Flying
+    };
+
     /**
      * @brief Enum class for different sensor statuses.
      */
+
     enum class SensorStatus{
         Absent,
         Disabled,
@@ -54,6 +61,11 @@ namespace quadlink{
              * @return The quadlink::Sensors status of the sensors.
              */
             quadlink::SensorStatus check_sensors_status();
+
+            /**
+            * @brief Checks if the the vehicle is armed at the current moment.
+            */
+            quadlink::VehicleStatus check_is_armed();
 
             /**
              * @brief Performs a bitmask operation AND to verify sensor status.

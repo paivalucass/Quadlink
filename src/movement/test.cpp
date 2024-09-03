@@ -15,8 +15,10 @@ int main() {
     quadlink::Vehicle vehicle = quadlink::Vehicle::QuadCopter;
     quadlink::UAV quadcopter(vehicle);
     std::string connection_url = "127.0.0.1:14562";
-    quadlink::FlightStatus status = quadcopter.connect(connection_url);
-    status = quadcopter.arm();
+    quadlink::ConnectionStatus status = quadcopter.connect(connection_url);
+    status = quadcopter.arm(quadlink::ArdupilotFlightMode::GUIDED);
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    status = quadcopter.takeoff(2, false);
     return 0;
 }
 
