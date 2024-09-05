@@ -161,9 +161,8 @@ quadlink::ConnectionStatus quadlink::QuadConnector::connect_udp(std::string& con
     }
 }
 
-quadlink::ConnectionStatus quadlink::QuadConnector::send_mav_message(mavlink_command_long_t &command)
+quadlink::ConnectionStatus quadlink::QuadConnector::send_mav_message(mavlink_message_t msg)
 {   
-    mavlink_message_t msg = quadlink::QuadConnector::build_message(command);
     int len = mavlink_msg_to_send_buffer(quadlink::QuadConnector::buffer, &msg);
     quadlink::MessageStatus ack_status;
 
@@ -189,7 +188,7 @@ quadlink::ConnectionStatus quadlink::QuadConnector::send_mav_message(mavlink_com
     return quadlink::ConnectionStatus::Timeout;
 }
 
-mavlink_message_t quadlink::QuadConnector::build_message(mavlink_command_long_t &command)
+mavlink_message_t quadlink::QuadConnector::build_command(mavlink_command_long_t &command)
 {
     mavlink_message_t msg;
 

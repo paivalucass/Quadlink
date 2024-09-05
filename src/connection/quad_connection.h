@@ -74,18 +74,21 @@ namespace quadlink {
 
         /**
          * @brief Sends a mavlink message to the last drone url connected.
-         * @param msg The message to send.
+         * @param msg The message mavlink message.
          * @return The status of the connection.
          */
-        quadlink::ConnectionStatus send_mav_message(mavlink_command_long_t &msg);
+        quadlink::ConnectionStatus send_mav_message(mavlink_message_t msg);
 
-    private:
+    protected:
         /**
          * @brief Appends the system ID and component ID, completing the message scope.
          * @param msg The message to build.
          * @return The built message.
          */
-        mavlink_message_t build_message(mavlink_command_long_t &msg);
+        mavlink_message_t build_command(mavlink_command_long_t &msg);
+
+
+    private:
 
         /**
          * @brief Create a socket binded to the given URL info.
