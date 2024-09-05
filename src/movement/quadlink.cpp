@@ -133,34 +133,33 @@ quadlink::ConnectionStatus UAV::takeoff(float target_height, bool blocking)
         std::cout << RED_BOLD_TEXT << "[ERROR] " << quadlink::UAV::vehicle_name << " NOT ARMED" << RESET_TEXT << std::endl;
         return quadlink::ConnectionStatus::Failed;
     }
+
+    return quadlink::ConnectionStatus::Failed;
 }
 
-quadlink::ConnectionStatus UAV::land(bool check)
+quadlink::ConnectionStatus UAV::land(bool verify_only)
 {
-    // if (check)
-    // {
-    //     if (UAV::telemetry->armed())
-    //     {
-    //         return quadlink::ConnectionStatus::IN_PROGRESS;
-    //     }
-    //     else
-    //     {
-    //         std::cout << GREEN_BOLD_TEXT << "[INFO]" << UAV::vehicle_name << " landed successfully" << RESET_TEXT << std::endl;
-    //         return quadlink::ConnectionStatus::FINISHED;
-    //     }
-    // }
+    if (verify_only){
+        if (quadlink::QuadTelemetry::check_is_armed() == quadlink::VehicleStatus::Armed){
+            return quadlink::ConnectionStatus::In_progress;
+        }
+        else
+        {
+            return quadlink::ConnectionStatus::Finished;
+        }
+    }
 
-    // std::cout << YELLOW_BOLD_TEXT << "[INFO] Landing..." << RESET_TEXT << std::endl;
-    // const mavsdk::Action::Result landing = UAV::action->land();
+    std::cout << YELLOW_BOLD_TEXT << "[INFO] LANDING..." << RESET_TEXT << std::endl;
 
-    // if (landing == mavsdk::Action::Result::Success)
-    // {
-    //     return quadlink::ConnectionStatus::IN_PROGRESS;
-    // }
-    // else
-    // {
-    //     std::cerr << "Landing failed" << std::endl;
-    //     return quadlink::ConnectionStatus::FAILED;
-    // }
+    if (quadlink::QuadAction::action_change_mode(quadlink::ArdupilotFlightMode::LAND) == quadlink::ConnectionStatus::Finished)
+    {
+        return quadlink::ConnectionStatus::Finished;
+    }
+    else
+    {
+        std::cerr << "[ERROR] FAILED LANDING" << std::endl;
+        return quadlink::ConnectionStatus::Failed;
+    }
+    return quadlink::ConnectionStatus::Failed;
 }
 }

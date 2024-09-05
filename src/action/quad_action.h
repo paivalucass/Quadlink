@@ -27,6 +27,8 @@ namespace quadlink{
 
             quadlink::ConnectionStatus action_takeoff();
 
+            quadlink::ConnectionStatus action_land();
+            
             void action_set_takeoff_height(float height);
 
         private:

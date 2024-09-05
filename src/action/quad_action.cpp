@@ -35,10 +35,16 @@ quadlink::ConnectionStatus quadlink::QuadAction::action_takeoff(){
     return quadlink::QuadConnector::send_mav_message(takeoff_command);
 }
 
+quadlink::ConnectionStatus quadlink::QuadAction::action_land(){
+    // TODO: Implement action land
+}
+
 
 void quadlink::QuadAction::action_set_takeoff_height(float height){
 
     quadlink::QuadAction::_takeoff_height = height;
 }
+
+
 }
 
