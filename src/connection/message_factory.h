@@ -42,6 +42,8 @@ namespace quadlink{
 
             mavlink_command_long_t create_set_home_command();
 
+            mavlink_command_long_t create_land_command();
+
 
         private:
 
