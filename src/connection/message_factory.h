@@ -80,7 +80,7 @@ namespace quadlink{
              * @brief Creates a set local NED command message.
              * @return The created message.
              */
-            mavlink_command_long_t create_set_local_ned();
+            mavlink_set_position_target_local_ned_t create_set_local_ned_command();
 
         private:
 
