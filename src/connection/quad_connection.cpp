@@ -195,7 +195,21 @@ mavlink_message_t quadlink::QuadConnector::build_command(mavlink_command_long_t 
     command.target_system = quadlink::QuadConnector::target_system_id;
     command.target_component = quadlink::QuadConnector::target_component_id;
 
+    // maybe a buffer manipulation here in the future?
     mavlink_msg_command_long_encode(quadlink::QuadConnector::system_id, quadlink::QuadConnector::component_id, &msg, &command);
+
+    return msg;
+}
+
+mavlink_message_t quadlink::QuadConnector::build_command(mavlink_set_position_target_local_ned_t &command){
+
+    mavlink_message_t msg;
+
+    command.target_system = quadlink::QuadConnector::target_system_id;
+    command.target_component = quadlink::QuadConnector::target_component_id;
+
+    // maybe a buffer manipulation here in the future?
+    mavlink_msg_set_position_target_local_ned_encode(quadlink::QuadConnector::system_id, quadlink::QuadConnector::component_id, &msg, &command);
 
     return msg;
 }

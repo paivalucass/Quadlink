@@ -74,8 +74,11 @@ namespace quadlink{
              * @param yaw_rate The yaw rate.
              * @return The quadlink::ConnectionStatus representing the go to.
             */
-            quadlink::ConnectionStatus action_set_position_target_local_ned(uint16_t type_mask, float x, float y, float z, float vx = 0, float vy = 0, float vz = 0, float ax = 0, float ay = 0, float az = 0, float yaw = 0, float yaw_rate = 0);
+            quadlink::ConnectionStatus action_set_position_target_local_ned(float x, float y, float z, float vx = 0, float vy = 0, float vz = 0, float ax = 0, float ay = 0, float az = 0, float yaw = 0, float yaw_rate = 0, uint16_t type_mask = 0b0000110111111000);
             
+            quadlink::ConnectionStatus action_set_position_target_body(float x, float y, float z, float vx = 0, float vy = 0, float vz = 0, float ax = 0, float ay = 0, float az = 0, float yaw = 0, float yaw_rate = 0, uint16_t type_mask = 0b0000110111111000);
+
+
             /**
              * @brief Sets the takeoff height of the quadcopter.
              * @param height The desired takeoff height.

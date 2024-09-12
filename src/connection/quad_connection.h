@@ -29,6 +29,11 @@ namespace quadlink {
         In_progress
     };
 
+    enum class EncodeType{
+        COOMAND_LONG,
+        POSITION_TARGET_LOCAL_NED
+    };
+
     /**
      * @brief Struct for the status of a message.
      */
@@ -82,10 +87,17 @@ namespace quadlink {
     protected:
         /**
          * @brief Appends the system ID and component ID, completing the message scope.
-         * @param msg The message to build.
+         * @param msg The command long to build.
          * @return The built message.
          */
-        mavlink_message_t build_command(mavlink_command_long_t &msg);
+        mavlink_message_t build_command(mavlink_command_long_t &command);
+
+        /**
+         * @brief Appends the system ID and component ID, completing the message scope.
+         * @param msg The set_position_target_local_ned command to build.
+         * @return The built message.
+        */
+        mavlink_message_t build_command(mavlink_set_position_target_local_ned_t &command);
 
     private:
 
