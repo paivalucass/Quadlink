@@ -87,7 +87,6 @@ namespace quadlink {
          */
         mavlink_message_t build_command(mavlink_command_long_t &msg);
 
-
     private:
 
         /**
