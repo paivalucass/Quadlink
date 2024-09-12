@@ -52,4 +52,20 @@ mavlink_command_long_t quadlink::MessageFactory::create_takeoff_command(float he
     return command;
 }
 
+mavlink_command_long_t quadlink::MessageFactory::create_land_command(){
+    mavlink_command_long_t command = {0};
+
+    // TODO: Implement land message construction
+    return command;
+
+}
+
+mavlink_command_long_t quadlink::MessageFactory::create_set_local_ned(){
+    mavlink_command_long_t command = {0};
+
+    command.command = MAV_FRAME_LOCAL_NED;
+
+    return command;
+}
+
 }

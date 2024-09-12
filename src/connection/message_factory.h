@@ -17,9 +17,10 @@
 
 namespace quadlink{
 
-    /*
-        Currently only supporting Ardupilot modes. PX4 should be added in the near future
-    */
+    /**
+     * @brief Enum class for Ardupilot flight modes.
+     * Currently only supporting Ardupilot modes. PX4 should be added in the near future.
+     */
     enum class ArdupilotFlightMode{
         STABILIZE = 0,
         GUIDED = 4,
@@ -27,21 +28,59 @@ namespace quadlink{
         LAND = 9
     };
 
+    /**
+     * @brief A class for creating mavlink messages.
+     */
     class MessageFactory
     {
         public:
+            /**
+             * @brief Constructor for MessageFactory.
+             */
             MessageFactory();
 
+            /**
+             * @brief Destructor for MessageFactory.
+             */
             ~MessageFactory() = default;
 
+            /**
+             * @brief Creates an arm command message.
+             * @return The created message.
+             */
             mavlink_command_long_t create_arm_command();
 
+            /**
+             * @brief Creates a mode command message.
+             * @param mode The desired flight mode.
+             * @return The created message.
+             */
             mavlink_command_long_t create_mode_command(ArdupilotFlightMode mode);
 
+            /**
+             * @brief Creates a takeoff command message.
+             * @param height The desired takeoff height.
+             * @return The created message.
+             */
             mavlink_command_long_t create_takeoff_command(float height);
 
+            /**
+             * @brief Creates a set home command message.
+             * @return The created message.
+             */
             mavlink_command_long_t create_set_home_command();
 
+            /**
+             * @brief Creates a land command message.
+             * @return The created message.
+             */
+            mavlink_command_long_t create_land_command();
+
+            /**
+             * @brief Creates a set local NED command message.
+             * @return The created message.
+             */
+            mavlink_command_long_t create_set_local_ned();
 
         private:
 
