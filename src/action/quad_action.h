@@ -58,6 +58,23 @@ namespace quadlink{
              * @return The status of the connection.
              */
             quadlink::ConnectionStatus action_land();
+
+            /**
+             * @brief Sets position x y z in local ned.
+             * @param x The x-coordinate of the position.
+             * @param y The y-coordinate of the position.
+             * @param z The z-coordinate of the position.
+             * @param vx The velocity in x.
+             * @param vy The velocity in y.
+             * @param vz The velocity in z.
+             * @param ax The acceleration in x.
+             * @param ay The acceleration in y.
+             * @param az The acceleration in z. 
+             * @param yaw The target yaw.
+             * @param yaw_rate The yaw rate.
+             * @return The quadlink::ConnectionStatus representing the go to.
+            */
+            quadlink::ConnectionStatus action_set_position_target_local_ned(uint16_t type_mask, float x, float y, float z, float vx = 0, float vy = 0, float vz = 0, float ax = 0, float ay = 0, float az = 0, float yaw = 0, float yaw_rate = 0);
             
             /**
              * @brief Sets the takeoff height of the quadcopter.

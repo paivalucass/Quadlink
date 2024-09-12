@@ -44,14 +44,19 @@ quadlink::ConnectionStatus quadlink::QuadAction::action_takeoff(){
 }
 
 quadlink::ConnectionStatus quadlink::QuadAction::action_land(){
-    // TODO: Implement action land
+    // TODO: Implement action land (actually needed?)
 }
 
+quadlink::ConnectionStatus quadlink::QuadAction::action_set_position_target_local_ned(uint16_t type_mask, float x, float y, float z, float vx = 0, float vy = 0, float vz = 0, float ax = 0, float ay = 0, float az = 0, float yaw = 0, float yaw_rate = 0){
+
+}
 
 void quadlink::QuadAction::action_set_takeoff_height(float height){
 
     quadlink::QuadAction::_takeoff_height = height;
 }
+
+
 
 
 }
