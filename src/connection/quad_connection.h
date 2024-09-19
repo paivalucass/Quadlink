@@ -43,6 +43,7 @@ namespace quadlink {
         mavlink_command_ack_t ack;
         mavlink_sys_status_t sys;
         mavlink_heartbeat_t heartbeat;
+        mavlink_local_position_ned_t local_position;
     } MessageStatus;
 
     /**

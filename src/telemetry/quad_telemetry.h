@@ -56,6 +56,14 @@ namespace quadlink{
             ~QuadTelemetry() = default;
 
             /**
+             * @brief Performs a bitmask operation AND to verify sensor status.
+             * @param sys The system info.
+             * @param sensor The sensor to check.
+             * @return The quadlink::SensorStatus status of the sensor.
+             */
+            quadlink::SensorStatus sensor_health(mavlink_sys_status_t sys, uint8_t sensor);
+
+            /**
              * @brief Checks the health of the main sensors.
              * This method checks via bitmap the health of GYRO, ACCELEROMETER, MAGNETOMETER, GPS from a quadcopter.
              * @return The quadlink::Sensors status of the sensors.
@@ -67,13 +75,7 @@ namespace quadlink{
             */
             quadlink::VehicleStatus check_is_armed();
 
-            /**
-             * @brief Performs a bitmask operation AND to verify sensor status.
-             * @param sys The system info.
-             * @param sensor The sensor to check.
-             * @return The quadlink::SensorStatus status of the sensor.
-             */
-            quadlink::SensorStatus sensor_health(mavlink_sys_status_t sys, uint8_t sensor);
+            mavlink_local_position_ned_t check_local_position();
 
         private:
             std::string parse_sensor_status(SensorStatus status);

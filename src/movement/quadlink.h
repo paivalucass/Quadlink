@@ -21,6 +21,8 @@
 #include <cmath>
 #include "../connection/message_factory.h"
 
+#define POSITION_THRESHOLD 0.1; // ideal value?
+
 namespace quadlink {
 
     /**
