@@ -100,6 +100,4 @@ mavlink_set_position_target_local_ned_t quadlink::MessageFactory::create_set_bod
     return command;
 
 }
-
-
 }

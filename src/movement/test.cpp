@@ -20,7 +20,7 @@ int main() {
     std::this_thread::sleep_for(std::chrono::seconds(3));
     status = quadcopter.takeoff(1.5, false);
     std::this_thread::sleep_for(std::chrono::seconds(7));
-    status = quadcopter.go_to_ned(-2, 7, -1.5);
+    status = quadcopter.go_to_body(4, 0, 0);
     std::this_thread::sleep_for(std::chrono::seconds(4));
     return 0;
 }

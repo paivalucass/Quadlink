@@ -74,13 +74,22 @@ namespace quadlink {
         ConnectionStatus land(bool check);
 
         /**
-         * @brief Go to a pre-defined position.
+         * @brief Go to a pre-defined position using local ned.
          * @param x The x-coordinate of the position.
          * @param y The y-coordinate of the position.
          * @param z The z-coordinate of the position (reversed axis).
          * @return The quadlink::ConnectionStatus representing the go to.
          */
         ConnectionStatus go_to_ned(float x, float y, float z);
+
+        /**
+         * @brief Go to a pre-defined position using body.
+         * @param x The x-coordinate of the position.
+         * @param y The y-coordinate of the position.
+         * @param z The z-coordinate of the position (reversed axis).
+         * @return The quadlink::ConnectionStatus representing the go to.
+         */
+        ConnectionStatus go_to_body(float x, float y, float z);
 
         /**
          * @brief Obtain the battery status of the drone.
