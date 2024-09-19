@@ -30,8 +30,9 @@ namespace quadlink {
     };
 
     enum class EncodeType{
-        COOMAND_LONG,
-        POSITION_TARGET_LOCAL_NED
+        COMMAND_LONG,
+        POSITION_TARGET_LOCAL_NED,
+        POSITION_TARGET_BODY
     };
 
     /**
@@ -82,7 +83,7 @@ namespace quadlink {
          * @param msg The message mavlink message.
          * @return The status of the connection.
          */
-        quadlink::ConnectionStatus send_mav_message(mavlink_message_t msg);
+        quadlink::ConnectionStatus send_mav_message(mavlink_message_t msg, EncodeType encode);
 
     protected:
         /**

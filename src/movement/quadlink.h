@@ -77,10 +77,10 @@ namespace quadlink {
          * @brief Go to a pre-defined position.
          * @param x The x-coordinate of the position.
          * @param y The y-coordinate of the position.
-         * @param z The z-coordinate of the position.
+         * @param z The z-coordinate of the position (reversed axis).
          * @return The quadlink::ConnectionStatus representing the go to.
          */
-        ConnectionStatus go_to_relative(double x, double y, double z);
+        ConnectionStatus go_to_ned(float x, float y, float z);
 
         /**
          * @brief Obtain the battery status of the drone.

@@ -19,8 +19,8 @@ int main() {
     status = quadcopter.arm(quadlink::ArdupilotFlightMode::GUIDED);
     std::this_thread::sleep_for(std::chrono::seconds(3));
     status = quadcopter.takeoff(1.5, false);
-    std::this_thread::sleep_for(std::chrono::seconds(4));
-    status = quadcopter.land(false);
+    std::this_thread::sleep_for(std::chrono::seconds(7));
+    status = quadcopter.go_to_ned(-2, 7, -1.5);
     std::this_thread::sleep_for(std::chrono::seconds(4));
     return 0;
 }

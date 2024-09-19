@@ -13,7 +13,7 @@ quadlink::ConnectionStatus quadlink::QuadAction::action_arm(){
 
     mavlink_message_t msg = this->build_command(arm_command);
 
-    return quadlink::QuadConnector::send_mav_message(msg);
+    return quadlink::QuadConnector::send_mav_message(msg, quadlink::EncodeType::COMMAND_LONG);
 }
 
 quadlink::ConnectionStatus quadlink::QuadAction::action_change_mode(ArdupilotFlightMode flight_mode){
@@ -22,7 +22,7 @@ quadlink::ConnectionStatus quadlink::QuadAction::action_change_mode(ArdupilotFli
 
     mavlink_message_t msg = this->build_command(mode_command);
 
-    return quadlink::QuadConnector::send_mav_message(msg);
+    return quadlink::QuadConnector::send_mav_message(msg, quadlink::EncodeType::COMMAND_LONG);
 }
 
 quadlink::ConnectionStatus quadlink::QuadAction::action_set_home_position(){
@@ -31,7 +31,7 @@ quadlink::ConnectionStatus quadlink::QuadAction::action_set_home_position(){
 
     mavlink_message_t msg = this->build_command(home_command);
 
-    return quadlink::QuadConnector::send_mav_message(msg);
+    return quadlink::QuadConnector::send_mav_message(msg, quadlink::EncodeType::COMMAND_LONG);
 }
 
 quadlink::ConnectionStatus quadlink::QuadAction::action_takeoff(){
@@ -40,14 +40,14 @@ quadlink::ConnectionStatus quadlink::QuadAction::action_takeoff(){
 
     mavlink_message_t msg = this->build_command(takeoff_command);
 
-    return quadlink::QuadConnector::send_mav_message(msg);
+    return quadlink::QuadConnector::send_mav_message(msg, quadlink::EncodeType::COMMAND_LONG);
 }
 
 quadlink::ConnectionStatus quadlink::QuadAction::action_land(){
     // TODO: Implement action land (actually needed?)
 }
 
-quadlink::ConnectionStatus quadlink::QuadAction::action_set_position_target_local_ned(float x, float y, float z, float vx = 0, float vy = 0, float vz = 0, float ax = 0, float ay = 0, float az = 0, float yaw = 0, float yaw_rate = 0, uint16_t type_mask = 0b0000110111111000){
+quadlink::ConnectionStatus quadlink::QuadAction::action_set_position_target_local_ned(float x, float y, float z, float vx, float vy, float vz, float ax, float ay, float az, float yaw, float yaw_rate, uint16_t type_mask){
     // default action is based only in position
     mavlink_set_position_target_local_ned_t target_local_ned_command = msg_factory->create_set_local_ned_command(type_mask, 
                                                                                                                  x, 
@@ -64,10 +64,10 @@ quadlink::ConnectionStatus quadlink::QuadAction::action_set_position_target_loca
 
     mavlink_message_t msg = this->build_command(target_local_ned_command);                                                                                  
 
-    return quadlink::QuadConnector::send_mav_message(msg);
+    return quadlink::QuadConnector::send_mav_message(msg, quadlink::EncodeType::POSITION_TARGET_LOCAL_NED);
 }
 
-quadlink::ConnectionStatus quadlink::QuadAction::action_set_position_target_body(float x, float y, float z, float vx = 0, float vy = 0, float vz = 0, float ax = 0, float ay = 0, float az = 0, float yaw = 0, float yaw_rate = 0, uint16_t type_mask = 0b0000110111111000){
+quadlink::ConnectionStatus quadlink::QuadAction::action_set_position_target_body(float x, float y, float z, float vx, float vy, float vz, float ax, float ay, float az, float yaw, float yaw_rate, uint16_t type_mask){
     mavlink_set_position_target_local_ned_t target_body_command = msg_factory->create_set_body_command(type_mask, 
                                                                                                                  x, 
                                                                                                                  y, 
@@ -83,17 +83,12 @@ quadlink::ConnectionStatus quadlink::QuadAction::action_set_position_target_body
 
     mavlink_message_t msg = this->build_command(target_body_command);                                                                                  
 
-    return quadlink::QuadConnector::send_mav_message(msg);
+    return quadlink::QuadConnector::send_mav_message(msg, quadlink::EncodeType::POSITION_TARGET_BODY);
 }
-
 
 void quadlink::QuadAction::action_set_takeoff_height(float height){
 
     quadlink::QuadAction::_takeoff_height = height;
 }
-
-
-
-
 }
 
