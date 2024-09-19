@@ -180,4 +180,25 @@ quadlink::ConnectionStatus UAV::go_to_ned(float x, float y, float z){
     }
     return quadlink::ConnectionStatus::Failed;
 }
+
+quadlink::ConnectionStatus UAV::go_to_body(float x, float y, float z){
+    // TODO: CHECK IF UAV IS FLYING AT A SAFE ALTITUDE
+
+    switch (quadlink::QuadAction::action_set_position_target_body(x, y, z))
+    {
+        case (quadlink::ConnectionStatus::Finished):
+            std::cout << GREEN_BOLD_TEXT << "[INFO] MOVING..." << RESET_TEXT << std::endl;
+            return quadlink::ConnectionStatus::Finished;
+        case (quadlink::ConnectionStatus::Failed):
+            std::cerr << RED_BOLD_TEXT << "[ERROR] FAILED MOVING" << RESET_TEXT << std::endl; 
+            return quadlink::ConnectionStatus::Failed;
+        case (quadlink::ConnectionStatus::Timeout):
+            std::cerr << RED_BOLD_TEXT << "[TIMEOUT] TIMEOUT MOVING" << RESET_TEXT << std::endl;
+            return quadlink::ConnectionStatus::Timeout;
+        default:
+            break;
+    }
+    return quadlink::ConnectionStatus::Failed;
+}
+
 }
