@@ -87,4 +87,10 @@ quadlink::VehicleStatus quadlink::QuadTelemetry::check_is_armed(){
     }
     return quadlink::VehicleStatus::Disarmed;
 }
+
+mavlink_local_position_ned_t quadlink::QuadTelemetry::check_local_position(){
+    quadlink::MessageStatus status = quadlink::QuadConnector::wait_message(MAVLINK_MSG_ID_LOCAL_POSITION_NED, 2);
+    
+    return status.local_position;
+}
 }

@@ -198,6 +198,7 @@ quadlink::ConnectionStatus UAV::go_to_body(float x, float y, float z){
         default:
             break;
     }
+
     return quadlink::ConnectionStatus::Failed;
 }
 

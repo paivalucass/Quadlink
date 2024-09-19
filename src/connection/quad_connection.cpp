@@ -29,15 +29,18 @@ quadlink::MessageStatus quadlink::QuadConnector::check_message(uint16_t target_I
                     mavlink_msg_heartbeat_decode(&msg, &return_status.heartbeat);
                     // CURRENTLY HARD CODED BUT CAN BE THE CAUSE OF FUTURE PROBLEMS WITH CONNECTION, THIS SHOULD BE CHANGED ASAP TO A MORE DYNAMIC APPROACH
                     quadlink::QuadConnector::target_system_id = msg.sysid;
-                    quadlink::QuadConnector::system_id = 1; // Considering both system id and component id from sneder are always 1 (should be working for now)
+                    quadlink::QuadConnector::system_id = 1; // Considering both system id and component id from sender are always 1 (should be working for now)
                     quadlink::QuadConnector::component_id = 1;
-                    quadlink::QuadConnector::target_component_id = 1; // 1 is usually the autopilot (theres only one)
+                    quadlink::QuadConnector::target_component_id = 1; // 1 is USUALLY the autopilot (theres only one)
                 }
                 else if (target_ID == MAVLINK_MSG_ID_COMMAND_ACK){
                     mavlink_msg_command_ack_decode(&msg, &return_status.ack);
                 }
                 else if (target_ID == MAVLINK_MSG_ID_SYS_STATUS){
                     mavlink_msg_sys_status_decode(&msg, &return_status.sys);
+                }
+                else if (target_ID == MAVLINK_MSG_ID_LOCAL_POSITION_NED){
+                    mavlink_msg_local_position_ned_decode(&msg, &return_status.local_position);
                 }
                 return_status.connection = quadlink::ConnectionStatus::Finished;
                 return return_status;
@@ -190,11 +193,8 @@ quadlink::ConnectionStatus quadlink::QuadConnector::send_mav_message(mavlink_mes
         }
         return quadlink::ConnectionStatus::Timeout;
     }
-    else if (encode == quadlink::EncodeType::POSITION_TARGET_LOCAL_NED){
-        sendto(quadlink::QuadConnector::sockfd, quadlink::QuadConnector::buffer, len, 0, (struct sockaddr*)&drone_addr, sizeof(drone_addr));  
-        return quadlink::ConnectionStatus::Finished;
-    }
-    else if (encode == quadlink::EncodeType::POSITION_TARGET_BODY){
+    else if (encode == quadlink::EncodeType::POSITION_TARGET_LOCAL_NED || encode == quadlink::EncodeType::POSITION_TARGET_BODY){
+        // TODO: Verify message arrival.
         sendto(quadlink::QuadConnector::sockfd, quadlink::QuadConnector::buffer, len, 0, (struct sockaddr*)&drone_addr, sizeof(drone_addr));  
         return quadlink::ConnectionStatus::Finished;
     }
