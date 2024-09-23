@@ -58,7 +58,22 @@ namespace quadlink{
              * @return The status of the connection.
              */
             quadlink::ConnectionStatus action_land();
-            
+
+            /**
+             * @brief Sets the target position in local NED coordinates.
+             * @param position The array of positions, velocity and acceleration.
+             * @return The status of the connection.
+             */
+            quadlink::ConnectionStatus action_set_position_target_local_ned(float* position);
+
+            /**
+             * @brief Sets the target position in body frame coordinates.
+             * @param position The array of positions, velocity and acceleration.
+             * @return The status of the connection.
+             */
+            quadlink::ConnectionStatus action_set_position_target_body(float* position);
+
+
             /**
              * @brief Sets the takeoff height of the quadcopter.
              * @param height The desired takeoff height.

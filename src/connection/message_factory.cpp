@@ -60,12 +60,50 @@ mavlink_command_long_t quadlink::MessageFactory::create_land_command(){
 
 }
 
-mavlink_command_long_t quadlink::MessageFactory::create_set_local_ned(){
-    mavlink_command_long_t command = {0};
+mavlink_set_position_target_local_ned_t quadlink::MessageFactory::create_set_local_ned_command(float* position){
+    mavlink_set_position_target_local_ned_t command = {0};
 
-    command.command = MAV_FRAME_LOCAL_NED;
+    uint16_t type_mask = 0b000000000000;
+
+    command.coordinate_frame = MAV_FRAME_LOCAL_NED;
+    command.type_mask = type_mask;
+    command.x = position[0];
+    command.y = position[1];
+    command.z = position[2];
+    command.vx = position[3];
+    command.vy = position[4];
+    command.vz = position[5];
+    command.afx = position[6];
+    command.afy = position[7];
+    command.afz = position[8];
+    // pos 9 reserved for use force
+    command.yaw = position[10];
+    command.yaw_rate = position[11];
 
     return command;
 }
 
+mavlink_set_position_target_local_ned_t quadlink::MessageFactory::create_set_body_command(float* position){
+    mavlink_set_position_target_local_ned_t command = {0};
+
+    uint16_t type_mask = 0b000000000000; // hard coding this value can be the reason for future issues, #TODO: try to change this structure
+
+    command.coordinate_frame = MAV_FRAME_BODY_NED;
+    command.type_mask = type_mask;
+    command.x = position[0];
+    command.y = position[1];
+    command.z = position[2];
+    command.vx = position[3];
+    command.vy = position[4];
+    command.vz = position[5];
+    command.afx = position[6];
+    command.afy = position[7];
+    command.afz = position[8];
+    // pos 9 reserved for use force
+    command.yaw = position[10];
+    command.yaw_rate = position[11];
+
+    return command;
+
+}
 }
