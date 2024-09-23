@@ -80,12 +80,12 @@ namespace quadlink{
              * @brief Creates a set local NED command message.
              * @return The created message.
              */
-            mavlink_set_position_target_local_ned_t create_set_local_ned_command(uint16_t type_mask, float x, float y, float z, float vx, float vy, float vz, float ax, float ay, float az, float yaw, float yaw_rate);
+            mavlink_set_position_target_local_ned_t create_set_local_ned_command(float* position);
             
             /**
              * 
             */
-            mavlink_set_position_target_local_ned_t create_set_body_command(uint16_t type_mask, float x, float y, float z, float vx, float vy, float vz, float ax, float ay, float az, float yaw, float yaw_rate);
+            mavlink_set_position_target_local_ned_t create_set_body_command(float* position);
 
 
         private:
