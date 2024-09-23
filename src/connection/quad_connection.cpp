@@ -194,7 +194,8 @@ quadlink::ConnectionStatus quadlink::QuadConnector::send_mav_message(mavlink_mes
         return quadlink::ConnectionStatus::Timeout;
     }
     else if (encode == quadlink::EncodeType::POSITION_TARGET_LOCAL_NED || encode == quadlink::EncodeType::POSITION_TARGET_BODY){
-        // TODO: Verify message arrival.
+        // TODO: Verify message arrival (it may not happen with only one sendto).
+        sendto(quadlink::QuadConnector::sockfd, quadlink::QuadConnector::buffer, len, 0, (struct sockaddr*)&drone_addr, sizeof(drone_addr));
         sendto(quadlink::QuadConnector::sockfd, quadlink::QuadConnector::buffer, len, 0, (struct sockaddr*)&drone_addr, sizeof(drone_addr));  
         return quadlink::ConnectionStatus::Finished;
     }

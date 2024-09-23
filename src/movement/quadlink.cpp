@@ -161,30 +161,11 @@ quadlink::ConnectionStatus UAV::land(bool verify_only)
     return quadlink::ConnectionStatus::Failed;
 }
 
-quadlink::ConnectionStatus UAV::go_to_ned(float x, float y, float z){
+quadlink::ConnectionStatus UAV::change_position_ned(float x, float y, float z){
     // TODO: CHECK IF UAV IS FLYING AT A SAFE ALTITUDE
+    float* position = new float[12] {x,y,z,0,0,0,0,0,0,0,0,0}; 
 
-    switch (quadlink::QuadAction::action_set_position_target_local_ned(x, y, z))
-    {
-        case (quadlink::ConnectionStatus::Finished):
-            std::cout << GREEN_BOLD_TEXT << "[INFO] MOVING..." << RESET_TEXT << std::endl;
-            return quadlink::ConnectionStatus::Finished;
-        case (quadlink::ConnectionStatus::Failed):
-            std::cerr << RED_BOLD_TEXT << "[ERROR] FAILED MOVING" << RESET_TEXT << std::endl; 
-            return quadlink::ConnectionStatus::Failed;
-        case (quadlink::ConnectionStatus::Timeout):
-            std::cerr << RED_BOLD_TEXT << "[TIMEOUT] TIMEOUT MOVING" << RESET_TEXT << std::endl;
-            return quadlink::ConnectionStatus::Timeout;
-        default:
-            break;
-    }
-    return quadlink::ConnectionStatus::Failed;
-}
-
-quadlink::ConnectionStatus UAV::go_to_body(float x, float y, float z){
-    // TODO: CHECK IF UAV IS FLYING AT A SAFE ALTITUDE
-
-    switch (quadlink::QuadAction::action_set_position_target_body(x, y, z))
+    switch (quadlink::QuadAction::action_set_position_target_local_ned(position))
     {
         case (quadlink::ConnectionStatus::Finished):
             std::cout << GREEN_BOLD_TEXT << "[INFO] MOVING..." << RESET_TEXT << std::endl;
@@ -199,7 +180,74 @@ quadlink::ConnectionStatus UAV::go_to_body(float x, float y, float z){
             break;
     }
 
+    delete[] position;
     return quadlink::ConnectionStatus::Failed;
 }
 
+quadlink::ConnectionStatus UAV::change_position_body(float x, float y, float z){
+    // TODO: CHECK IF UAV IS FLYING AT A SAFE ALTITUDE
+    float* position = new float[12] {x,y,z,0,0,0,0,0,0,0,0,0};
+
+    switch (quadlink::QuadAction::action_set_position_target_body(position))
+    {
+        case (quadlink::ConnectionStatus::Finished):
+            std::cout << GREEN_BOLD_TEXT << "[INFO] MOVING..." << RESET_TEXT << std::endl;
+            return quadlink::ConnectionStatus::Finished;
+        case (quadlink::ConnectionStatus::Failed):
+            std::cerr << RED_BOLD_TEXT << "[ERROR] FAILED MOVING" << RESET_TEXT << std::endl; 
+            return quadlink::ConnectionStatus::Failed;
+        case (quadlink::ConnectionStatus::Timeout):
+            std::cerr << RED_BOLD_TEXT << "[TIMEOUT] TIMEOUT MOVING" << RESET_TEXT << std::endl;
+            return quadlink::ConnectionStatus::Timeout;
+        default:
+            break;
+    }
+
+    delete[] position;
+    return quadlink::ConnectionStatus::Failed;
+}
+
+quadlink::ConnectionStatus UAV::change_velocity(float xv, float yv, float zv){
+    float* position = new float[12] {0,0,0,xv,yv,zv,0,0,0,0,0,0};
+
+    switch (quadlink::QuadAction::action_set_position_target_body(position))
+    {
+        case (quadlink::ConnectionStatus::Finished):
+            std::cout << GREEN_BOLD_TEXT << "[INFO] MOVING..." << RESET_TEXT << std::endl;
+            return quadlink::ConnectionStatus::Finished;
+        case (quadlink::ConnectionStatus::Failed):
+            std::cerr << RED_BOLD_TEXT << "[ERROR] FAILED MOVING" << RESET_TEXT << std::endl; 
+            return quadlink::ConnectionStatus::Failed;
+        case (quadlink::ConnectionStatus::Timeout):
+            std::cerr << RED_BOLD_TEXT << "[TIMEOUT] TIMEOUT MOVING" << RESET_TEXT << std::endl;
+            return quadlink::ConnectionStatus::Timeout;
+        default:
+            break;
+    }
+
+    delete[] position;
+    return quadlink::ConnectionStatus::Failed;
+}
+
+quadlink::ConnectionStatus UAV::change_acceleration(float ax, float ay, float az){
+    float* position = new float[12] {0,0,0,0,0,0,ax,ay,az,0,0,0};
+
+    switch (quadlink::QuadAction::action_set_position_target_body(position))
+    {
+        case (quadlink::ConnectionStatus::Finished):
+            std::cout << GREEN_BOLD_TEXT << "[INFO] MOVING..." << RESET_TEXT << std::endl;
+            return quadlink::ConnectionStatus::Finished;
+        case (quadlink::ConnectionStatus::Failed):
+            std::cerr << RED_BOLD_TEXT << "[ERROR] FAILED MOVING" << RESET_TEXT << std::endl; 
+            return quadlink::ConnectionStatus::Failed;
+        case (quadlink::ConnectionStatus::Timeout):
+            std::cerr << RED_BOLD_TEXT << "[TIMEOUT] TIMEOUT MOVING" << RESET_TEXT << std::endl;
+            return quadlink::ConnectionStatus::Timeout;
+        default:
+            break;
+    }
+
+    delete[] position;
+    return quadlink::ConnectionStatus::Failed;
+}
 }

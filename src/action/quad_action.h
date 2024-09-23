@@ -61,39 +61,17 @@ namespace quadlink{
 
             /**
              * @brief Sets the target position in local NED coordinates.
-             * @param x The x-coordinate of the position.
-             * @param y The y-coordinate of the position.
-             * @param z The z-coordinate of the position.
-             * @param vx The velocity in x.
-             * @param vy The velocity in y.
-             * @param vz The velocity in z.
-             * @param ax The acceleration in x.
-             * @param ay The acceleration in y.
-             * @param az The acceleration in z.
-             * @param yaw The target yaw.
-             * @param yaw_rate The yaw rate.
-             * @param type_mask The bitmask to set which fields should be ignored. 
+             * @param position The array of positions, velocity and acceleration.
              * @return The status of the connection.
              */
-            quadlink::ConnectionStatus action_set_position_target_local_ned(float x, float y, float z, float vx = 0, float vy = 0, float vz = 0, float ax = 0, float ay = 0, float az = 0, float yaw = 0, float yaw_rate = 0, uint16_t type_mask = 0b0000110111111000);
+            quadlink::ConnectionStatus action_set_position_target_local_ned(float* position);
 
             /**
              * @brief Sets the target position in body frame coordinates.
-             * @param x The x-coordinate of the position.
-             * @param y The y-coordinate of the position.
-             * @param z The z-coordinate of the position.
-             * @param vx The velocity in x.
-             * @param vy The velocity in y.
-             * @param vz The velocity in z.
-             * @param ax The acceleration in x.
-             * @param ay The acceleration in y.
-             * @param az The acceleration in z.
-             * @param yaw The target yaw.
-             * @param yaw_rate The yaw rate.
-             * @param type_mask The bitmask to set which fields should be ignored.
+             * @param position The array of positions, velocity and acceleration.
              * @return The status of the connection.
              */
-            quadlink::ConnectionStatus action_set_position_target_body(float x, float y, float z, float vx = 0, float vy = 0, float vz = 0, float ax = 0, float ay = 0, float az = 0, float yaw = 0, float yaw_rate = 0, uint16_t type_mask = 0b0000110111111000);
+            quadlink::ConnectionStatus action_set_position_target_body(float* position);
 
 
             /**

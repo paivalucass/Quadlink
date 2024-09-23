@@ -47,39 +47,18 @@ quadlink::ConnectionStatus quadlink::QuadAction::action_land(){
     // TODO: Implement action land (actually needed?)
 }
 
-quadlink::ConnectionStatus quadlink::QuadAction::action_set_position_target_local_ned(float x, float y, float z, float vx, float vy, float vz, float ax, float ay, float az, float yaw, float yaw_rate, uint16_t type_mask){
-    // default action is based only in position
-    mavlink_set_position_target_local_ned_t target_local_ned_command = msg_factory->create_set_local_ned_command(type_mask, 
-                                                                                                                 x, 
-                                                                                                                 y, 
-                                                                                                                 z, 
-                                                                                                                 vx, 
-                                                                                                                 vy, 
-                                                                                                                 vz, 
-                                                                                                                 ax, 
-                                                                                                                 ay, 
-                                                                                                                 az, 
-                                                                                                                 yaw, 
-                                                                                                                 yaw_rate);
+quadlink::ConnectionStatus quadlink::QuadAction::action_set_position_target_local_ned(float* position){
+
+    mavlink_set_position_target_local_ned_t target_local_ned_command = msg_factory->create_set_local_ned_command(position);
 
     mavlink_message_t msg = this->build_command(target_local_ned_command);                                                                                  
 
     return quadlink::QuadConnector::send_mav_message(msg, quadlink::EncodeType::POSITION_TARGET_LOCAL_NED);
 }
 
-quadlink::ConnectionStatus quadlink::QuadAction::action_set_position_target_body(float x, float y, float z, float vx, float vy, float vz, float ax, float ay, float az, float yaw, float yaw_rate, uint16_t type_mask){
-    mavlink_set_position_target_local_ned_t target_body_command = msg_factory->create_set_body_command(type_mask, 
-                                                                                                                 x, 
-                                                                                                                 y, 
-                                                                                                                 z, 
-                                                                                                                 vx, 
-                                                                                                                 vy, 
-                                                                                                                 vz, 
-                                                                                                                 ax, 
-                                                                                                                 ay, 
-                                                                                                                 az, 
-                                                                                                                 yaw, 
-                                                                                                                 yaw_rate);
+quadlink::ConnectionStatus quadlink::QuadAction::action_set_position_target_body(float* position){
+
+    mavlink_set_position_target_local_ned_t target_body_command = msg_factory->create_set_body_command(position);
 
     mavlink_message_t msg = this->build_command(target_body_command);                                                                                  
 
