@@ -1,7 +1,4 @@
 #include <iostream>
-#include <mavsdk/mavsdk.h>
-#include <mavsdk/plugins/action/action.h>
-#include <mavsdk/plugins/telemetry/telemetry.h>
 #include <mavlink/common/mavlink.h>
 #include <chrono>
 #include <sys/socket.h>
