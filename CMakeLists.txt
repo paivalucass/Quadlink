@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.15)
 project(quadlink)
 
 add_subdirectory(src/gui)
+add_subdirectory(src/ros/src/quadlink_controller)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
