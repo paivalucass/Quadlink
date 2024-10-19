@@ -1,0 +1,9 @@
+# ninja log v6
+1	176	1728149333171573001	gui_autogen/timestamp	1af44343717b90ac
+1	176	1728149333171573001	gui_autogen/mocs_compilation.cpp	1af44343717b90ac
+1	176	1728149333171573001	/home/lucas/RCPILOTC/Quadlink/src/gui/build/Desktop_Qt_6_7_3-Debug/gui_autogen/timestamp	1af44343717b90ac
+1	176	1728149333171573001	/home/lucas/RCPILOTC/Quadlink/src/gui/build/Desktop_Qt_6_7_3-Debug/gui_autogen/mocs_compilation.cpp	1af44343717b90ac
+177	184	1728149333176572907	CMakeFiles/gui.dir/main.cpp.o	62d1756c9006b7d4
+177	294	1728149333176572907	CMakeFiles/gui.dir/gui_autogen/mocs_compilation.cpp.o	c465d2c22846cc98
+177	295	1728149333176572907	CMakeFiles/gui.dir/quadlink_main_window.cpp.o	d96fe5153373b352
+295	479	1728149333294570682	gui	7f04aacf7eff022c
