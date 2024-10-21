@@ -9,6 +9,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
 
 # add_executable(camera_listener src/camera_subscriber.cpp)
 # ament_target_dependencies(camera_listener rclcpp std_msgs)
