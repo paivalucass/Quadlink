@@ -11,13 +11,14 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 
-# add_executable(camera_listener src/camera_subscriber.cpp)
-# ament_target_dependencies(camera_listener rclcpp std_msgs)
+add_executable(camera_listener src/test.cpp
+                               src/subscriber.cpp)
+ament_target_dependencies(camera_listener rclcpp std_msgs sensor_msgs)
 
 
-# install(TARGETS
-#   camera_listener
-#   DESTINATION lib/${PROJECT_NAME})
+install(TARGETS
+  camera_listener
+  DESTINATION lib/${PROJECT_NAME})
 
 
 if(BUILD_TESTING)
