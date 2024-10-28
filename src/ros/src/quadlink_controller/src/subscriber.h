@@ -9,8 +9,6 @@
 #include <utility>
 #include <any>
 
-
-
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
 #include "sensor_msgs/msg/image.hpp"
@@ -22,7 +20,6 @@ namespace quadlink {
       Success,
       Failed
   };
-
 
   class Subscriber : public rclcpp::Node, public std::enable_shared_from_this<Subscriber>
   {
@@ -38,27 +35,28 @@ namespace quadlink {
       T read_from_topic(const std::string topic, std::shared_ptr<quadlink::Subscriber> node_ptr);
     private:
       template <typename T>    
-      std::function<void(const T&)> topic_callback_wrapper(const std::string& topic_name);
+      std::function<void(const std::shared_ptr<const T>&)> topic_callback_wrapper(const std::string& topic_name);
 
       template <typename T>
-      void topic_callback(const std::string topic, const T & msg);
+      void topic_callback(const std::string topic, const std::shared_ptr<const T>& msg);
       
       std::unordered_map<std::string, std::pair<rclcpp::SubscriptionBase::SharedPtr, std::any>> __subscriptions;
   };
 
-
 template <typename T>
-std::function<void(const T&)> quadlink::Subscriber::topic_callback_wrapper(const std::string& topic_name){
-    std::cout << "hey" << std::endl;
-    return [this, topic_name](const T & msg) {
+std::function<void(const std::shared_ptr<const T>&)> quadlink::Subscriber::topic_callback_wrapper(const std::string& topic_name){
+    RCLCPP_INFO(this->get_logger(), "WARAPPER INVOKED %s", topic_name.c_str());
+    return [this, topic_name](const std::shared_ptr<const T>& msg) {
+        RCLCPP_INFO(this->get_logger(), "Callback wrapper invoked for topic: %s", topic_name.c_str());
         topic_callback(topic_name, msg);
     };
 }
 
 template <typename T>
-void quadlink::Subscriber::topic_callback(const std::string topic, const T & msg) 
+void quadlink::Subscriber::topic_callback(const std::string topic, const std::shared_ptr<const T>& msg) 
 {
-    __subscriptions[topic].second = msg;
+    RCLCPP_INFO(this->get_logger(), "WOW");
+    __subscriptions[topic].second = *msg;
 }
 
 template <typename T>
@@ -75,6 +73,12 @@ quadlink::StatusROS quadlink::Subscriber::add_subscriber(const std::string topic
     quadlink::Subscriber::topic_callback_wrapper<T>(topic) 
     );
 
+    if (subscription) {
+        RCLCPP_INFO(this->get_logger(), "Subscription created successfully for topic: %s", topic.c_str());
+    } else {
+        RCLCPP_ERROR(this->get_logger(), "Failed to create subscription for topic: %s", topic.c_str());
+    }
+
     __subscriptions[topic] = {subscription, nullptr};
 
     return quadlink::StatusROS::Success;
@@ -84,19 +88,19 @@ template <typename T>
 T quadlink::Subscriber::read_from_topic(const std::string topic, std::shared_ptr<quadlink::Subscriber> node_ptr)
 {
     if (__subscriptions.find(topic) == __subscriptions.end()){
-        /**
+        /**nullptr
          * Creates a new subscription if one does not exist.
          */
+
         this->add_subscriber<T>(topic);
     }
     
-    std::cout << topic << std::endl;
+    std::this_thread::sleep_for(std::chrono::seconds(2)); // Wait for the subscription to be created first
 
     rclcpp::spin_some(node_ptr);
 
     const auto& any_msg = __subscriptions[topic].second;
     if (any_msg.type() != typeid(T)) {
-        // Print type information for debugging
         RCLCPP_ERROR(this->get_logger(), "Type mismatch. Expected %s but got %s",
                     typeid(T).name(), any_msg.type().name());
         throw std::bad_any_cast();
