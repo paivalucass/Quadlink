@@ -45,9 +45,7 @@ namespace quadlink {
 
 template <typename T>
 std::function<void(const std::shared_ptr<const T>&)> quadlink::Subscriber::topic_callback_wrapper(const std::string& topic_name){
-    RCLCPP_INFO(this->get_logger(), "WARAPPER INVOKED %s", topic_name.c_str());
     return [this, topic_name](const std::shared_ptr<const T>& msg) {
-        RCLCPP_INFO(this->get_logger(), "Callback wrapper invoked for topic: %s", topic_name.c_str());
         topic_callback(topic_name, msg);
     };
 }
@@ -55,7 +53,6 @@ std::function<void(const std::shared_ptr<const T>&)> quadlink::Subscriber::topic
 template <typename T>
 void quadlink::Subscriber::topic_callback(const std::string topic, const std::shared_ptr<const T>& msg) 
 {
-    RCLCPP_INFO(this->get_logger(), "WOW");
     __subscriptions[topic].second = *msg;
 }
 
@@ -101,7 +98,7 @@ T quadlink::Subscriber::read_from_topic(const std::string topic, std::shared_ptr
 
     const auto& any_msg = __subscriptions[topic].second;
     if (any_msg.type() != typeid(T)) {
-        RCLCPP_ERROR(this->get_logger(), "Type mismatch. Expected %s but got %s",
+        RCLCPP_ERROR(this->get_logger(), "Type mismatch when receiving message. Expected %s but got %s. Please change the type of the message in the subscriber.",
                     typeid(T).name(), any_msg.type().name());
         throw std::bad_any_cast();
     }
