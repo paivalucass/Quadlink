@@ -1,5 +1,6 @@
 #include "publisher.h"
 
-quadlink::Subscriber::Subscriber() : Node("Publisher") {
+quadlink::Publisher::Publisher() : Node("Publisher") 
+{
 
 }

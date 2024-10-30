@@ -29,13 +29,13 @@ namespace quadlink{
             void publish_on_topic(const std::string topic, DataType data);
 
         private:
-            std::unordered_map<std::string, rclcpp::PublisherBase::SharedPtr> __publishers;
+            std::unordered_map<std::string, std::any> __publishers;
     };
 
     template <typename DataType>
     quadlink::StatusROS quadlink::Publisher::add_publisher(const std::string topic){
 
-        __publishers[topic] = this->create_publisher<DataType>(topic, 10);
+        this->__publishers[topic] = this->create_publisher<DataType>(topic, 10);
 
         std::this_thread::sleep_for(std::chrono::seconds(2));
 
@@ -43,14 +43,16 @@ namespace quadlink{
     }
 
     template <typename DataType>
-    void publish_on_topic(const std::string topic, DataType data){
-        if (__publishers.find(topic) == __publishers.end()){
+    void quadlink::Publisher::publish_on_topic(const std::string topic, DataType data){
+        if (this->__publishers.find(topic) == this->__publishers.end()){
 
             this->add_publisher<DataType>(topic);
 
         }
+        
+        auto publisher = std::any_cast<std::shared_ptr<rclcpp::Publisher<DataType>>>(this->__publishers[topic]);
 
-        __publishers[topic]->publish(data);
+        publisher->publish(data);
 
     }
 }
