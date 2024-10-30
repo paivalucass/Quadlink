@@ -8,7 +8,6 @@
 #include <unordered_map>
 #include <utility>
 #include <any>
-
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
 #include "sensor_msgs/msg/image.hpp"
@@ -16,6 +15,7 @@
 using std::placeholders::_1;
 
 namespace quadlink {
+
   enum class StatusROS{
       Success,
       Failed
@@ -73,10 +73,13 @@ quadlink::StatusROS quadlink::Subscriber::add_subscriber(const std::string topic
     if (subscription) {
         RCLCPP_INFO(this->get_logger(), "Subscription created successfully for topic: %s", topic.c_str());
     } else {
-        RCLCPP_ERROR(this->get_logger(), "Failed to create subscription for topic: %s", topic.c_str());
+        RCLCPP_ERROR(this->get_logger(), "Failed to create subscription for topic: %s. Please check if the given topic name is correct", topic.c_str());
+        return quadlink::StatusROS::Failed;
     }
 
     __subscriptions[topic] = {subscription, nullptr};
+
+    std::this_thread::sleep_for(std::chrono::seconds(2));
 
     return quadlink::StatusROS::Success;
 }
@@ -91,8 +94,6 @@ T quadlink::Subscriber::read_from_topic(const std::string topic, std::shared_ptr
 
         this->add_subscriber<T>(topic);
     }
-    
-    std::this_thread::sleep_for(std::chrono::seconds(2)); // Wait for the subscription to be created first
 
     rclcpp::spin_some(node_ptr);
 
