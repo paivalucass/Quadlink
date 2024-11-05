@@ -2,8 +2,10 @@ cmake_minimum_required(VERSION 3.15)
 
 project(quadlink)
 
-add_subdirectory(src/gui)
 add_subdirectory(src/ros/src/quadlink_controller)
+
+find_package(Qt5 COMPONENTS Widgets REQUIRED)
+find_package(Qt5Core REQUIRED)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -21,4 +23,4 @@ add_executable(quadlink src/movement/test.cpp
                         src/action/quad_action.cpp)
 
 target_link_libraries(quadlink 
-)
+                      PRIVATE Qt5::Widgets)
