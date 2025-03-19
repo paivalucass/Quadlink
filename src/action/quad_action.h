@@ -81,7 +81,6 @@ namespace quadlink{
             void action_set_takeoff_height(float height);
 
         private:
-            std::shared_ptr<quadlink::MessageFactory> msg_factory;
             float _takeoff_height;
     };
 }

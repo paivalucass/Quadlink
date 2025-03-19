@@ -15,7 +15,6 @@
 
 namespace quadlink{
 
-
     class Publisher : public rclcpp::Node, public std::enable_shared_from_this<Subscriber>{
         public: 
             Publisher();

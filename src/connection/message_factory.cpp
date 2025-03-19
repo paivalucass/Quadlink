@@ -1,12 +1,9 @@
 #include "message_factory.h"
 
 namespace quadlink{
-quadlink::MessageFactory::MessageFactory(){
-
-}
 
 
-mavlink_command_long_t quadlink::MessageFactory::create_arm_command(){
+mavlink_command_long_t create_arm_command(){
 
     mavlink_command_long_t command = {0};
     
@@ -18,7 +15,7 @@ mavlink_command_long_t quadlink::MessageFactory::create_arm_command(){
     return command;
 }
 
-mavlink_command_long_t quadlink::MessageFactory::create_mode_command(ArdupilotFlightMode flight_mode){
+mavlink_command_long_t create_mode_command(ArdupilotFlightMode flight_mode){
 
     float mode = static_cast<float>(flight_mode);
 
@@ -32,17 +29,17 @@ mavlink_command_long_t quadlink::MessageFactory::create_mode_command(ArdupilotFl
     return command;    
 }
 
-mavlink_command_long_t quadlink::MessageFactory::create_set_home_command(){
+mavlink_command_long_t create_set_home_command(){
 
     mavlink_command_long_t command = {0}; 
 
     command.command = MAV_CMD_DO_SET_HOME;
-    command.param1 = 1;  // 1 para usar a posição atual do sistema, 0 para definir manualmente
+    command.param1 = 1;  
 
     return command;
 }
 
-mavlink_command_long_t quadlink::MessageFactory::create_takeoff_command(float height){
+mavlink_command_long_t create_takeoff_command(float height){
 
     mavlink_command_long_t command = {0};
 
@@ -52,7 +49,7 @@ mavlink_command_long_t quadlink::MessageFactory::create_takeoff_command(float he
     return command;
 }
 
-mavlink_command_long_t quadlink::MessageFactory::create_land_command(){
+mavlink_command_long_t create_land_command(){
     mavlink_command_long_t command = {0};
 
     // TODO: Implement land message construction
@@ -60,7 +57,7 @@ mavlink_command_long_t quadlink::MessageFactory::create_land_command(){
 
 }
 
-mavlink_set_position_target_local_ned_t quadlink::MessageFactory::create_set_local_ned_command(float* position){
+mavlink_set_position_target_local_ned_t create_set_local_ned_command(float* position){
     mavlink_set_position_target_local_ned_t command = {0};
 
     uint16_t type_mask = 0b000000000000;
@@ -83,7 +80,7 @@ mavlink_set_position_target_local_ned_t quadlink::MessageFactory::create_set_loc
     return command;
 }
 
-mavlink_set_position_target_local_ned_t quadlink::MessageFactory::create_set_body_command(float* position){
+mavlink_set_position_target_local_ned_t create_set_body_command(float* position){
     mavlink_set_position_target_local_ned_t command = {0};
 
     uint16_t type_mask = 0b000000000000; // hard coding this value can be the reason for future issues, #TODO: try to change this structure

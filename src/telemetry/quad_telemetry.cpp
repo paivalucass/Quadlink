@@ -2,7 +2,7 @@
 
 namespace quadlink{
 
-quadlink::QuadTelemetry::QuadTelemetry() : msg_factory(std::make_shared<quadlink::MessageFactory>()){   
+quadlink::QuadTelemetry::QuadTelemetry() {   
 }
 
 quadlink::SensorStatus quadlink::QuadTelemetry::sensor_health(mavlink_sys_status_t sys, uint8_t sensor){

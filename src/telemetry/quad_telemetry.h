@@ -80,6 +80,5 @@ namespace quadlink{
         private:
             std::string parse_sensor_status(SensorStatus status);
             quadlink::Sensors sensors;
-            std::shared_ptr<quadlink::MessageFactory> msg_factory;
     };
 }

@@ -2,25 +2,23 @@
 
 #include <string>
 #include <memory>
-#include <mavlink/common/mavlink.h>
+#include <mavlink/v2.0/common/mavlink.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <cmath>
-#include "utils/strings.h"
-#include "utils/mav_messages.h"
-#include "utils/clock.h"
+#include "communication/strings.hpp"
+#include "communication/clock.hpp"
 #include <iostream>
 #include <chrono>
 #include <fcntl.h>
 #include <termios.h>
-
-
+#include <thread>
 
 #define TIMEOUT_SECONDS 5;
 #define TIMEOUT_MILISECONDS 0;
 
-namespace quadlink {
+namespace rcpilot {
 
     /**
      * @brief Enum class for connection statuses.
@@ -39,6 +37,13 @@ namespace quadlink {
         POSITION_TARGET_BODY
     };
 
+    enum class ArdupilotFlightMode{
+        STABILIZE = 0,
+        GUIDED = 4,
+        LOITER = 5,
+        LAND = 9
+    };
+
     /**
      * @brief Struct for the status of a message.
      */
@@ -53,27 +58,27 @@ namespace quadlink {
     /**
      * @brief A class for connecting to an UAV.
      */
-    class QuadConnector
+    class Connector
     {
     public:
         /**
-         * @brief Constructor for QuadConnector.
+         * @brief Constructor for Connector.
          */
-        QuadConnector();
+        Connector();
 
         /**
-         * @brief Destructor for QuadConnector.
+         * @brief Destructor for Connector.
          */
-        ~QuadConnector();
+        ~Connector();
 
         /**
          * @brief Identifies the drone in the given IP/PORT and verifies the heartbeat.
          * Waits 5 seconds for the heartbeat.
-         * If heartbeat not found, returns a quadlink::ConnectionStatus::Timeout.
+         * If heartbeat not found, returns a rcpilot::ConnectionStatus::Timeout.
          * @param connection_url The URL for the connection.
          * @return The status of the connection.
          */
-        quadlink::ConnectionStatus connect_udp(std::string& connection_url);
+        rcpilot::ConnectionStatus connect_udp(std::string& connection_url);
 
         /**
          * @brief Wait for a given mavlink message to be received.
@@ -81,14 +86,14 @@ namespace quadlink {
          * @param time_waiting The time to wait for the message in seconds.
          * @return The status of the message.
          */
-        quadlink::MessageStatus wait_message(uint16_t target_ID, double time_waiting);
+        rcpilot::MessageStatus wait_message(uint16_t target_ID, double time_waiting);
 
         /**
          * @brief Sends a mavlink message to the last drone url connected.
          * @param msg The mavlink message.
          * @return The status of the connection.
          */
-        quadlink::ConnectionStatus send_mav_message(mavlink_message_t msg, EncodeType encode);
+        rcpilot::ConnectionStatus send_mav_message(mavlink_message_t msg, EncodeType encode);
 
     protected:
         /**
@@ -112,19 +117,26 @@ namespace quadlink {
          * @param connection_url The URL for the connection.
          * @return The status of the connection.
          */
-        quadlink::ConnectionStatus create_socket(std::string& connection_url);
+        rcpilot::ConnectionStatus create_socket(std::string& connection_url);
+
+        /**
+         * @brief Open a serial port. This option is a WIP and may or may not be used in the future
+         * @param device The serial port for the connection.
+         * @return The status of the connection.
+         */
+        rcpilot::ConnectionStatus open_serial_port(std::string& device);
 
         /**
          * @brief Checks if a message is from the given mavlink ID.
          * @param target_ID The ID of the target message.
          * @return The status of the message.
          */
-        quadlink::MessageStatus check_message(uint16_t target_ID);
+        rcpilot::MessageStatus check_message(uint16_t target_ID);
 
-        quadlink::Clock clock;
-        int serialfd;
+        rcpilot::Clock clock;
         std::vector<std::string> connection_url;
-        int sockfd;
+        static int sockfd;
+        static int serialfd;
         struct sockaddr_in server_addr;
         struct sockaddr_in drone_addr;
         uint8_t* buffer;

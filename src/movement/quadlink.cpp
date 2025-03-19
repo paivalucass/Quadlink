@@ -251,3 +251,4 @@ quadlink::ConnectionStatus UAV::change_acceleration(float ax, float ay, float az
     return quadlink::ConnectionStatus::Failed;
 }
 }
+

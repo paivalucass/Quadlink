@@ -96,6 +96,8 @@ quadlink::ConnectionStatus quadlink::QuadConnector::create_socket(std::string& c
     return quadlink::ConnectionStatus::Finished;
 }
 
+
+
 quadlink::MessageStatus quadlink::QuadConnector::wait_message(uint16_t target_ID, double time_waiting)
 {
     ssize_t recv_len;

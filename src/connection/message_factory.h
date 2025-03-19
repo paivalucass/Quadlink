@@ -29,66 +29,46 @@ namespace quadlink{
     };
 
     /**
-     * @brief A class for creating mavlink messages.
+     * @brief Creates an arm command message.
+     * @return The created message.
      */
-    class MessageFactory
-    {
-        public:
-            /**
-             * @brief Constructor for MessageFactory.
-             */
-            MessageFactory();
+    mavlink_command_long_t create_arm_command();
 
-            /**
-             * @brief Destructor for MessageFactory.
-             */
-            ~MessageFactory() = default;
+    /**
+     * @brief Creates a mode command message.
+     * @param mode The desired flight mode.
+     * @return The created message.
+     */
+    mavlink_command_long_t create_mode_command(ArdupilotFlightMode mode);
 
-            /**
-             * @brief Creates an arm command message.
-             * @return The created message.
-             */
-            mavlink_command_long_t create_arm_command();
+    /**
+     * @brief Creates a takeoff command message.
+     * @param height The desired takeoff height.
+     * @return The created message.
+     */
+    mavlink_command_long_t create_takeoff_command(float height);
 
-            /**
-             * @brief Creates a mode command message.
-             * @param mode The desired flight mode.
-             * @return The created message.
-             */
-            mavlink_command_long_t create_mode_command(ArdupilotFlightMode mode);
+    /**
+     * @brief Creates a set home command message.
+     * @return The created message.
+     */
+    mavlink_command_long_t create_set_home_command();
 
-            /**
-             * @brief Creates a takeoff command message.
-             * @param height The desired takeoff height.
-             * @return The created message.
-             */
-            mavlink_command_long_t create_takeoff_command(float height);
+    /**
+     * @brief Creates a land command message.
+     * @return The created message.
+     */
+    mavlink_command_long_t create_land_command();
 
-            /**
-             * @brief Creates a set home command message.
-             * @return The created message.
-             */
-            mavlink_command_long_t create_set_home_command();
+    /**
+     * @brief Creates a set local NED command message.
+     * @return The created message.
+     */
+    mavlink_set_position_target_local_ned_t create_set_local_ned_command(float* position);
 
-            /**
-             * @brief Creates a land command message.
-             * @return The created message.
-             */
-            mavlink_command_long_t create_land_command();
+    /**
+     * 
+    */
+    mavlink_set_position_target_local_ned_t create_set_body_command(float* position);
 
-            /**
-             * @brief Creates a set local NED command message.
-             * @return The created message.
-             */
-            mavlink_set_position_target_local_ned_t create_set_local_ned_command(float* position);
-            
-            /**
-             * 
-            */
-            mavlink_set_position_target_local_ned_t create_set_body_command(float* position);
-
-
-        private:
-
-    };
 }
